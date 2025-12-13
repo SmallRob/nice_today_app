@@ -23,6 +23,7 @@ function createWindow() {
     },
     icon: path.join(__dirname, 'build/icons/icon-256x256.png'),
     titleBarStyle: 'default',
+    autoHideMenuBar: true, // 隐藏菜单栏
     show: false
   })
 
@@ -31,7 +32,9 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:3000')
     mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../frontend/build/index.html'))
+    // 在生产环境中，加载打包后的前端文件
+    const appPath = process.resourcesPath ? path.join(process.resourcesPath, 'app') : path.join(__dirname, '../frontend/build');
+    mainWindow.loadFile(path.join(appPath, 'index.html'))
   }
 
   // 窗口准备就绪后显示

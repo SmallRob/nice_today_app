@@ -19,18 +19,20 @@
       "from": "services",
       "to": "services",
       "filter": ["**/*.js"]
-    },
-    {
-      "from": "../backend",
-      "to": "backend",
-      "filter": ["**/*.py", "**/*.json", "requirements.txt"]
     }
   ],
   "extraResources": [
     {
-      "from": "backend/services",
-      "to": "services",
-      "filter": ["**/*"]
+      "from": "../backend",
+      "to": "backend",
+      "filter": [
+        "**/*",
+        "!node_modules",
+        "!*.log",
+        "!logs/**/*",
+        "!__pycache__/**/*",
+        "!*.pyc"
+      ]
     }
   ],
   "win": {

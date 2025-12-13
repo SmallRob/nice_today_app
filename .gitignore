@@ -26,3 +26,4 @@ frontend/.DS_Store
 .DS_Store
 electron/node_modules/
 electron/dist/
+electron/build/icons/
