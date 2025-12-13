@@ -1,0 +1,95 @@
+{
+  "appId": "com.nicetoday.desktop",
+  "productName": "Nice Today",
+  "copyright": "Copyright © 2025 Nice Today",
+  "directories": {
+    "output": "dist",
+    "buildResources": "build"
+  },
+  "files": [
+    "main.js",
+    "preload.js",
+    "package.json",
+    {
+      "from": "public",
+      "to": "public",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "services",
+      "to": "services",
+      "filter": ["**/*.js"]
+    },
+    {
+      "from": "../backend",
+      "to": "backend",
+      "filter": ["**/*.py", "**/*.json", "requirements.txt"]
+    }
+  ],
+  "extraResources": [
+    {
+      "from": "backend/services",
+      "to": "services",
+      "filter": ["**/*"]
+    }
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      },
+      {
+        "target": "portable",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "build/icons/icon-256x256.ico",
+    "publisherName": "Nice Today",
+    "verifyUpdateCodeSignature": false
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Nice Today",
+    "installerIcon": "build/icons/icon-256x256.ico",
+    "uninstallerIcon": "build/icons/icon-256x256.ico"
+  },
+  "mac": {
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["x64", "arm64"]
+      }
+    ],
+    "icon": "build/icons/icon.icns",
+    "category": "public.app-category.lifestyle",
+    "darkModeSupport": true
+  },
+  "linux": {
+    "target": [
+      {
+        "target": "AppImage",
+        "arch": ["x64"]
+      },
+      {
+        "target": "deb",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "build/icons/icon-512x512.png",
+    "category": "Education",
+    "desktop": {
+      "Name": "Nice Today",
+      "Comment": "生物节律与玛雅历法应用",
+      "Categories": "Education;Science;",
+      "Keywords": "biorhythm;maya;calendar;health;"
+    }
+  },
+  "publish": {
+    "provider": "github",
+    "releaseType": "release"
+  }
+}

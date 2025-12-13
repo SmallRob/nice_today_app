@@ -1,0 +1,36 @@
+{
+  "name": "nice-today-app",
+  "version": "1.0.0",
+  "description": "Nice Today - 生物节律与玛雅历法应用",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:electron\"",
+    "dev:frontend": "cd frontend && npm start",
+    "dev:electron": "cd electron && npm run dev",
+    "build": "npm run build:frontend && npm run build:electron",
+    "build:frontend": "cd frontend && npm run build",
+    "build:electron": "cd electron && npm run build",
+    "dist": "npm run build && cd electron && npm run dist",
+    "dist:win": "npm run build && cd electron && npm run dist:win",
+    "dist:mac": "npm run build && cd electron && npm run dist:mac",
+    "dist:linux": "npm run build && cd electron && npm run dist:linux",
+    "install:all": "npm install && cd frontend && npm install && cd ../electron && npm install",
+    "clean": "rm -rf frontend/build electron/dist electron/node_modules"
+  },
+  "keywords": [
+    "biorhythm",
+    "maya",
+    "calendar",
+    "electron",
+    "react"
+  ],
+  "author": "Nice Today Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
