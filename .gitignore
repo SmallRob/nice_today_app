@@ -25,3 +25,4 @@ frontend/.DS_Store
 .qoder/OpenSpec/.gitignore
 .DS_Store
 electron/node_modules/
+electron/dist/
