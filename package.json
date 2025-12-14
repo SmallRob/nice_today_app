@@ -29,7 +29,8 @@
   "author": "Nice Today Team",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.0.0"
+    "concurrently": "^8.0.0",
+    "png-to-ico": "^3.0.1"
   },
   "engines": {
     "node": ">=16.0.0",

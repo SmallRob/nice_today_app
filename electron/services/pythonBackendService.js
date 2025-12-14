@@ -92,8 +92,7 @@ class PythonBackendService {
                 'python3',
                 'python.exe',
                 'python3.exe',
-                'py', // Windows Python启动器
-                'py -3', // Windows Python 3启动器
+                'py' // Windows Python启动器
             ];
             
             let currentIndex = 0;
@@ -117,12 +116,25 @@ class PythonBackendService {
                         shell: true // 使用shell执行，支持复杂命令
                     });
                     
+                    let stdoutData = '';
+                    let stderrData = '';
+                    
+                    pythonCheck.stdout.on('data', (data) => {
+                        stdoutData += data.toString();
+                    });
+                    
+                    pythonCheck.stderr.on('data', (data) => {
+                        stderrData += data.toString();
+                    });
+                    
                     pythonCheck.on('close', (code) => {
                         if (code === 0) {
-                            console.log(`✅ Python环境检测通过: ${pythonExecutable}`);
+                            const versionOutput = stdoutData || stderrData;
+                            console.log(`✅ Python环境检测通过: ${pythonExecutable} (${versionOutput.trim()})`);
                             this.pythonExecutable = pythonExecutable;
                             resolve();
                         } else {
+                            console.log(`Python可执行文件 ${pythonExecutable} 返回错误码: ${code}`);
                             currentIndex++;
                             tryNextExecutable();
                         }
@@ -150,14 +162,18 @@ class PythonBackendService {
             console.log('检查后端路径是否存在:', this.backendPath);
             if (!fs.existsSync(this.backendPath)) {
                 console.error('❌ 后端路径不存在:', this.backendPath);
-                reject(new Error(`后端路径不存在: ${this.backendPath}`));
+                // 启用Node.js回退
+                this.useNodeFallback = true;
+                resolve();
                 return;
             }
             
             console.log('检查Python脚本是否存在:', this.electronScript);
             if (!fs.existsSync(this.electronScript)) {
                 console.error('❌ Electron集成脚本不存在:', this.electronScript);
-                reject(new Error(`Electron集成脚本不存在: ${this.electronScript}`));
+                // 启用Node.js回退
+                this.useNodeFallback = true;
+                resolve();
                 return;
             }
             

@@ -33,6 +33,13 @@
         "!__pycache__/**/*",
         "!*.pyc"
       ]
+    },
+    {
+      "from": "../frontend/build",
+      "to": "app",
+      "filter": [
+        "**/*"
+      ]
     }
   ],
   "win": {
@@ -66,7 +73,7 @@
         "arch": ["x64", "arm64"]
       }
     ],
-    "icon": "build/icons/icon.icns",
+    "icon": "build/icons/icon-256x256.png",
     "category": "public.app-category.lifestyle",
     "darkModeSupport": true
   },
@@ -81,7 +88,7 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "build/icons/icon-512x512.png",
+    "icon": "build/icons/icon-256x256.png",
     "category": "Education",
     "desktop": {
       "Name": "Nice Today",

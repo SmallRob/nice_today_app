@@ -5,38 +5,42 @@ const path = require('path');
 console.log('🚀 开始构建 Nice Today Electron 桌面应用...');
 
 // 构建步骤
-async function buildElectronApp() {
+async function finalBuild() {
     try {
         // 获取项目根目录
-        const rootDir = path.join(__dirname, '..');
+        const rootDir = __dirname;
         const electronDir = path.join(rootDir, 'electron');
         const frontendDir = path.join(rootDir, 'frontend');
         const backendDir = path.join(rootDir, 'backend');
         const distDir = path.join(electronDir, 'dist');
         
-        // 步骤1: 清理之前的构建
+        // 步骤1: 清理环境
         console.log('\n📦 步骤1: 清理构建环境...');
         cleanDirectory(distDir);
         
-        // 步骤2: 安装前端依赖并构建
-        console.log('\n📦 步骤2: 构建前端应用...');
-        execSync('npm install', { cwd: frontendDir, stdio: 'inherit' });
-        execSync('npm run build', { cwd: frontendDir, stdio: 'inherit' });
+        // 步骤2: 创建图标文件
+        console.log('\n📦 步骤2: 创建应用图标...');
+        createAppIcons();
         
-        // 步骤3: 安装Electron依赖
-        console.log('\n📦 步骤3: 安装Electron依赖...');
-        execSync('npm install', { cwd: electronDir, stdio: 'inherit' });
+        // 步骤3: 安装前端依赖并构建
+        console.log('\n📦 步骤3: 构建前端应用...');
+        execSync('cd frontend && npm install', { stdio: 'inherit' });
+        execSync('cd frontend && npm run build', { stdio: 'inherit' });
         
-        // 步骤4: 验证后端文件
-        console.log('\n📦 步骤4: 验证后端文件...');
+        // 步骤4: 安装Electron依赖
+        console.log('\n📦 步骤4: 安装Electron依赖...');
+        execSync('cd electron && npm install', { stdio: 'inherit' });
+        
+        // 步骤5: 验证后端文件
+        console.log('\n📦 步骤5: 验证后端文件...');
         validateBackendFiles(backendDir);
         
-        // 步骤5: 构建Electron应用
-        console.log('\n📦 步骤5: 构建Electron桌面应用...');
-        execSync('npm run dist', { cwd: electronDir, stdio: 'inherit' });
+        // 步骤6: 构建Electron应用
+        console.log('\n📦 步骤6: 构建Electron桌面应用...');
+        execSync('cd electron && npm run build', { stdio: 'inherit' });
         
-        // 步骤6: 验证构建结果
-        console.log('\n📦 步骤6: 验证构建结果...');
+        // 步骤7: 验证构建结果
+        console.log('\n📦 步骤7: 验证构建结果...');
         validateBuildResult(distDir);
         
         console.log('\n🎉 Electron应用构建完成！');
@@ -73,19 +77,42 @@ function cleanDirectory(dirPath) {
             console.log(`✅ 清理成功: ${dirPath}`);
         } catch (error) {
             console.log(`❌ 清理失败 ${dirPath}: ${error.message}`);
-            // 如果是文件被锁定，等待后重试
-            if (error.code === 'EBUSY' || error.message.includes('被另一进程使用')) {
-                console.log('等待1秒后重试...');
-                setTimeout(() => {
-                    try {
-                        fs.rmSync(dirPath, { recursive: true, force: true });
-                        console.log(`✅ 重试清理成功: ${dirPath}`);
-                    } catch (retryError) {
-                        console.log(`❌ 重试清理失败: ${retryError.message}`);
-                    }
-                }, 1000);
-            }
         }
+    }
+}
+
+// 创建应用图标
+function createAppIcons() {
+    const iconsDir = path.join(__dirname, 'electron', 'build', 'icons');
+    if (!fs.existsSync(iconsDir)) {
+        fs.mkdirSync(iconsDir, { recursive: true });
+    }
+    
+    // 复制PNG图标
+    const sourcePng = path.join(__dirname, 'frontend', 'src', 'images', 'nice_day.png');
+    const destPng = path.join(iconsDir, 'icon-256x256.png');
+    
+    try {
+        fs.copyFileSync(sourcePng, destPng);
+        console.log('✅ PNG图标已复制到:', destPng);
+    } catch (err) {
+        console.error('❌ 复制PNG图标失败:', err);
+    }
+    
+    // 创建真实的ICO文件
+    try {
+        const { default: pngToIco } = require('png-to-ico');
+        pngToIco(sourcePng)
+            .then(buf => {
+                const icoPath = path.join(iconsDir, 'icon-256x256.ico');
+                fs.writeFileSync(icoPath, buf);
+                console.log('✅ 真实的ICO图标已创建:', icoPath);
+            })
+            .catch(err => {
+                console.error('❌ 创建ICO图标失败:', err);
+            });
+    } catch (err) {
+        console.error('❌ 导入png-to-ico失败:', err);
     }
 }
 
@@ -132,8 +159,15 @@ function validateBuildResult(distDir) {
         throw new Error('构建目录为空');
     }
     
+    // 检查是否生成了可执行文件
+    const exeFiles = files.filter(file => file.endsWith('.exe'));
+    if (exeFiles.length === 0) {
+        throw new Error('未生成可执行文件');
+    }
+    
     console.log('✅ 构建目录验证通过');
+    console.log(`✅ 生成了 ${exeFiles.length} 个可执行文件`);
 }
 
 // 运行构建
-buildElectronApp();
+finalBuild();
