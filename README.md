@@ -4,7 +4,7 @@
 
 ## 📋 项目简介
 
-Nice Today 是一个现代化的生物节律应用，通过分析用户的生物节律数据，提供个性化的健康建议和生活指导。项目采用前后端分离架构，支持多种部署方式。
+Nice Today 是一个现代化的生物节律应用，通过分析用户的生物节律数据，提供个性化的健康建议和生活指导。本项目采用 Electron 架构，提供桌面应用程序体验，支持跨平台运行。
 
 ## 🏗️ 技术栈
 
@@ -12,18 +12,16 @@ Nice Today 是一个现代化的生物节律应用，通过分析用户的生物
 - **React 18** - 现代化前端框架
 - **Tailwind CSS** - 原子化CSS框架
 - **Axios** - HTTP客户端
-- **WebSocket** - 实时通信
 
 ### 后端
-- **FastAPI** - 高性能Python Web框架
-- **Pydantic** - 数据验证
-- **SQLAlchemy** - ORM框架
-- **WebSocket** - 实时服务
+- **Electron** - 跨平台桌面应用程序框架
+- **JavaScript** - 纯JavaScript后端实现
+- **Node.js** - JavaScript运行时
 
-### 部署
-- **Docker** - 容器化部署
-- **Nginx** - 反向代理和负载均衡
-- **Docker Compose** - 多容器编排
+### 核心服务
+- **生物节律计算服务** - 精确计算用户的身体、情绪和智力节律
+- **穿衣指南服务** - 基于季节、五行理论和特殊日期的个性化建议
+- **玛雅历法服务** - 玛雅文化相关的历法计算
 
 ## 📁 项目结构
 
@@ -31,301 +29,299 @@ Nice Today 是一个现代化的生物节律应用，通过分析用户的生物
 nice_today/
 ├── frontend/                 # React前端应用
 │   ├── src/                # 源代码
-│   ├── public/             # 静态资源
-│   ├── package.json        # 依赖配置
-│   └── Dockerfile          # 前端容器配置
-├── backend/                # FastAPI后端服务
-│   ├── app.py             # 主应用入口
-│   ├── services/          # 业务逻辑服务
-│   │   ├── biorhythm_service.py   # 生物节律服务
-│   │   ├── dress_service.py       # 穿衣建议服务
-│   │   └── maya_service.py        # 玛雅历法服务
-│   ├── utils/             # 工具函数
-│   ├── config/            # 配置文件
-│   └── requirements.txt   # Python依赖
-├── nginx/                 # Nginx配置
+│   │   ├── components/     # React组件
+│   │   ├── assets/         # 静态资源
+│   │   └── index.js        # 入口文件
+│   ├── public/             # 公共资源
+│   ├── package.json        # 前端依赖配置
+│   └── webpack.config.js   # 前端构建配置
+├── backend/                # JavaScript后端服务
+│   ├── biorhythm.js       # 生物节律计算核心
+│   ├── maya.js            # 玛雅历法计算
+│   ├── dress.js           # 穿衣建议核心逻辑
+│   └── config/            # 配置文件
+├── electron/               # Electron主进程和渲染进程
+│   ├── main.js            # 主进程入口
+│   ├── preload.js         # 预加载脚本
+│   ├── menu.js            # 应用菜单
+│   ├── services/          # Electron后端服务
+│   │   ├── biorhythmService.js     # 生物节律服务
+│   │   ├── dressService.js         # 穿衣指南服务
+│   │   └── mayaService.js          # 玛雅历法服务
+│   └── package.json       # Electron依赖配置
+├── scripts/               # 构建和工具脚本
 ├── docs/                  # 项目文档
-├── docker-compose.yml     # Docker编排配置
-├── docker-compose-prod.yml # 生产环境配置
-└── scripts/               # 启动和部署脚本
+├── package.json           # 项目根配置
+├── build.js              # 应用构建脚本
+└── LICENSE               # 开源许可证
 ```
 
 ## 🚀 快速开始
 
 ### 系统要求
-- Docker Engine 19.03.0+
-- Docker Compose 1.27.0+
-- Node.js 16+ (本地开发)
-- Python 3.8+ (本地开发)
+- Node.js 16+ 
+- npm 7+
+- Electron 支持的操作系统（Windows 10+, macOS 10.14+, Ubuntu 18.04+）
 
-### 方式一：Docker快速部署（推荐）
+### 方式一：开发模式运行（推荐）
 
-#### Windows环境
-```powershell
-# 克隆项目
-git clone [项目地址]
-cd nice_today
-
-# 一键启动
-.\build_and_run.ps1
-
-# 或使用快速部署脚本
-.\quick_deploy.sh
-```
-
-#### Linux/macOS环境
 ```bash
 # 克隆项目
 git clone [项目地址]
 cd nice_today
 
-# 一键启动
-./build_and_run.sh
-
-# 或使用快速部署脚本
-./quick_deploy.sh
-```
-
-### 方式二：本地开发环境
-
-#### 1. 环境准备
-```bash
-# 复制环境变量模板
-cp env.example .env
-
-# 编辑配置文件
-vim .env
-```
-
-#### 2. 启动后端服务
-```bash
-# 安装Python依赖
-cd backend
-pip install -r requirements.txt
-
-# 启动后端服务
-python start_service.py
-
-# 或使用启动脚本
-python start_mcp_server.py
-```
-
-#### 3. 启动前端服务
-```bash
-# 安装Node依赖
-cd frontend
+# 安装依赖
 npm install
 
 # 启动开发服务器
 npm start
-# 或
-.\start.ps1  # Windows
-./start.sh    # Linux/macOS
 ```
 
-### 方式三：分步启动
+### 方式二：构建应用程序
 
-#### 1. 创建Docker网络
 ```bash
-./create-docker-network.sh
+# 克隆项目
+git clone [项目地址]
+cd nice_today
+
+# 安装依赖
+npm install
+
+# 构建前端资源
+npm run build
+
+# 启动Electron应用
+npm run electron
 ```
 
-#### 2. 连接Nginx到Docker网络
+### 方式三：打包可执行文件
+
 ```bash
-# Linux/macOS
-./connect-nginx-to-docker-network.sh
+# 克隆项目
+git clone [项目地址]
+cd nice_today
 
-# 或使用修复版本
-./connect-nginx-to-docker-network-fixed.sh
+# 安装依赖
+npm install
+
+# 打包应用程序
+npm run build-win    # Windows平台
+npm run build-mac    # macOS平台
+npm run build-linux  # Linux平台
 ```
 
-#### 3. 手动启动服务
+### 快速测试脚本
+
 ```bash
-# 构建镜像
-docker-compose build
+# 测试生物节律功能
+node integration_test.js
 
-# 启动服务
-docker-compose up -d
-
-# 查看日志
-docker-compose logs -f
+# 构建和测试完整流程
+node build_and_test.js
 ```
 
-## 🔗 服务访问
+## 🔧 开发指南
 
-服务启动成功后，可通过以下地址访问：
+### 项目脚本说明
 
-| 服务类型 | 地址 | 描述 |
-|---------|------|------|
-| 前端应用 | http://localhost:3000 | React用户界面 |
-| 后端API | http://localhost:5000 | FastAPI服务 |
-| API文档 | http://localhost:5000/docs | Swagger UI |
-| API文档(备用) | http://localhost:5000/redoc | ReDoc |
-| WebSocket | ws://localhost:8765/mcp | 实时通信 |
-| Nginx代理 | http://localhost:80 | 统一入口 |
+- `build.js` - 主构建脚本，负责构建前端资源和启动Electron应用
+- `build_and_test.js` - 构建并运行集成测试
+- `integration_test.js` - 集成测试脚本，验证各模块功能
+- `debug_resources.js` - 调试资源加载问题
+- `fix_frontend_components.js` - 修复前端组件问题
+- `create_real_icons.js` - 创建应用图标
+- `final_build.js` - 最终构建脚本
 
-## 🧪 测试和调试
+### 前端开发
 
-### 运行测试
 ```bash
-# 测试API接口
-./test/test_api.sh
+# 进入前端目录
+cd frontend
 
-# 测试MCP服务
-./test/test_mcp_service.py
+# 安装依赖
+npm install
 
-# 快速测试MCP服务
-./test/quick_test_mcp.sh
+# 启动开发服务器（热重载）
+npm start
+
+# 构建生产版本
+npm run build
 ```
 
-### 调试模式
+### 后端服务开发
+
 ```bash
-# 调试脚本
-./debug.ps1          # Windows
-./docker_debug.ps1   # Docker调试
-./start_debug.ps1    # 开发调试
+# 进入后端目录
+cd electron/services
+
+# 修改服务后重新启动应用
+npm start
 ```
 
-### 检查服务状态
-```bash
-# 查看运行状态
-docker-compose ps
+### 调试指南
 
-# 查看服务日志
-docker-compose logs [service-name]
+1. **开启调试模式**
+   ```bash
+   # 开启详细日志
+   DEBUG=true npm start
+   ```
 
-# 检查端口占用
-python backend/check_port.py
-```
+2. **查看日志**
+   - 前端日志：浏览器控制台
+   - 后端日志：Electron开发者工具控制台
 
-## 🛠️ 常用命令
-
-### Docker管理
-```bash
-# 启动服务
-docker-compose up -d
-
-# 停止服务
-docker-compose down
-
-# 重启服务
-docker-compose restart
-
-# 查看日志
-docker-compose logs -f
-
-# 重新构建
-docker-compose build --no-cache
-```
-
-### 服务重启
-```bash
-# 使用重启脚本
-./restart-services.sh
-```
-
-### 开发工具
-```bash
-# Windows专用脚本
-./start_cn.ps1        # 中文环境启动
-./start.bat          # Windows批处理启动
-
-# 部署检查
-./tools/deployment_check.sh
-```
+3. **常见问题排查**
+   - 检查端口占用：`netstat -ano | findstr :3000`
+   - 清理缓存：`npm run clean`
+   - 重新安装依赖：`rm -rf node_modules && npm install`
 
 ## 📊 主要功能
 
 ### 1. 生物节律分析
-- 计算用户的身体、情绪和智力节律
-- 可视化展示节律变化趋势
-- 提供每日节律状态报告
+- 精确计算用户的身体、情绪和智力节律周期
+- 可视化展示节律变化趋势图表
+- 提供每日节律状态详细报告
+- 支持自定义日期范围查询和分析
 
-### 2. 个性化建议
-- **穿衣建议**：根据节律状态推荐适合的服装
-- **饮食建议**：基于身体状况提供营养建议
-- **活动建议**：推荐适合当前状态的活动类型
+### 2. 个性化穿衣建议
+- **季节性建议**：根据当前季节推荐适合的服装
+- **五行理论**：结合中国传统五行理论提供穿衣指导
+- **特殊日期**：针对特殊节日和场合的着装建议
+- **节律状态适配**：根据生物节律状态调整穿衣建议
 
-### 3. 历史记录
-- 保存每日节律数据
-- 支持历史数据查询和对比
-- 生成周期性报告
+### 3. 饮食推荐系统
+- **多样化选择**：提供丰富的每日饮食建议
+- **原子化设计**：确保每日计算结果的唯一性和一致性
+- **营养均衡**：基于身体状况提供科学营养建议
+- **季节性食材**：推荐适合当季的健康食材
 
-### 4. 实时通知
-- WebSocket实时数据推送
-- 重要节点提醒功能
+### 4. 玛雅历法服务
+- 玛雅文化相关的历法计算
+- 传统智慧与现代生活的结合
+- 提供独特的文化体验视角
 
-### 5. API管理界面
-- Web-based API管理面板
-- API端点测试功能
-- 服务状态监控
-- 集成Swagger UI文档
-- 安全认证机制
-- 默认登录凭据: admin / admin123
-
-### 6. API文档管理
-- API文档查看和版本管理
-- 集成OpenAPI规范支持
-- 在线API测试工具
-- 请求历史记录管理
-- 响应数据格式化展示
+### 5. 日期精准计算
+- 本地时区支持（默认UTC+8）
+- 避免时区转换导致的日期偏差
+- 用户输入日期的精确处理
+- 独立于当前时间的纯数学计算
 
 ## 🔧 配置说明
 
-### 环境变量配置
-复制 `env.example` 为 `.env` 并配置以下参数：
+### 应用配置
+主要配置文件位于 `electron/config/` 目录：
 
-```bash
-# 数据库配置
-DATABASE_URL=sqlite:///./biorhythm.db
+```json
+{
+  "biorhythm": {
+    "physical_cycle": 23,
+    "emotional_cycle": 28,
+    "intellectual_cycle": 33
+  },
+  "dress": {
+    "seasons": ["spring", "summer", "autumn", "winter"],
+    "elements": ["木", "火", "土", "金", "水"]
+  }
+}
+```
 
-# API配置
-API_HOST=0.0.0.0
-API_PORT=5000
+### 前端配置
+前端配置文件位于 `frontend/src/config/` 目录：
 
-# 前端配置
-REACT_APP_API_URL=http://localhost:5000
+```javascript
+export const API_CONFIG = {
+  timeout: 5000,
+  retryAttempts: 3,
+  // 其他配置项
+};
 ```
 
 ### 自定义配置
-编辑 `backend/config/app_config.json` 可调整：
-- 节律计算参数
-- 建议算法权重
-- 通知设置
+编辑相关配置文件可调整：
+- 生物节律周期参数
+- 穿衣建议算法权重
+- 饮食推荐策略
+- 界面主题和样式
 
 ## 🐛 常见问题
 
-### 端口冲突
-如果端口被占用，修改 `.env` 文件中的端口号配置。
+### 应用启动失败
+1. 检查Node.js版本是否符合要求
+2. 清理node_modules并重新安装依赖
+3. 检查是否有其他进程占用了所需端口
 
-### 容器启动失败
+### 日期计算错误
+1. 确认系统时区设置正确
+2. 检查日期输入格式是否符合要求
+3. 查看控制台是否有相关错误信息
+
+### 穿衣指南无结果
+1. 检查配置文件是否完整
+2. 确认当前日期和季节参数是否正确
+3. 查看服务日志确认计算过程是否正常
+
+### 界面显示异常
+1. 尝试清除应用缓存
+2. 检查浏览器控制台的错误信息
+3. 确认前端资源是否正确加载
+
+## 🚀 发布Release版本到GitHub
+
+本项目提供了详细的发布指南和自动化脚本，请参考 [RELEASE_GUIDE.md](./RELEASE_GUIDE.md) 获取完整的发布流程说明。
+
+### 快速发布
+
+#### 方式一：使用自动化脚本（推荐）
 ```bash
-# 检查日志
-docker-compose logs
+# 发布补丁版本 (1.0.0 → 1.0.1)
+npm run release
 
-# 清理缓存
-docker system prune -a
+# 发布次要版本 (1.0.0 → 1.1.0)
+npm run release:minor
 
-# 重新构建
-docker-compose build --no-cache
+# 发布主要版本 (1.0.0 → 2.0.0)
+npm run release:major
+
+# 发布指定版本
+npm run release 1.2.3
 ```
 
-### 网络连接问题
-```bash
-# 检查Docker网络
-./create-docker-network.sh
-./connect-nginx-to-docker-network.sh
-```
+#### 方式二：手动发布
+1. 运行测试和构建
+   ```bash
+   npm test
+   npm run build
+   ```
+
+2. 创建Git标签
+   ```bash
+   git tag -a v1.0.0 -m "发布版本 1.0.0"
+   git push origin v1.0.0
+   ```
+
+3. 在GitHub创建Release并上传构建文件
+
+### 发布前检查清单
+- [ ] 所有测试通过
+- [ ] 版本号已更新
+- [ ] 构建文件可正常运行
+- [ ] 更新日志已编写
+- [ ] 发布说明已准备
+
+### Release最佳实践
+1. **语义化版本控制**：遵循 `主版本号.次版本号.修订号` 格式
+2. **详细的发布说明**：包含新功能、改进和修复的问题
+3. **添加附件**：提供各平台的可执行文件
+4. **更新CHANGELOG**：维护详细的变更记录
+5. **标签管理**：为每个重要版本创建对应的Git标签
 
 ## 📞 技术支持
 
 ### 文档资源
-- [部署指南](docs/DEPLOYMENT.md)
-- [部署报告](docs/DEPLOYMENT_REPORT.md)
-- [MCP服务状态](docs/MCP_SERVICE_STATUS.md)
-- [MCP测试指南](docs/MCP_TEST_GUIDE.md)
-- [问题分析与解决方案](docs/问题分析与解决方案.md)
-- [API管理使用指南](docs/api-management-guide.md)
+- [快速开始指南](QUICK_START.md)
+- [构建说明](BUILD_INSTRUCTIONS.md)
+- [验证步骤](VERIFICATION_STEPS.md)
+- [JavaScript实现说明](PURE_JAVASCRIPT_IMPLEMENTATION.md)
 
 ### 开发团队
 如有问题，请联系开发团队或提交Issue。
@@ -333,3 +329,29 @@ docker-compose build --no-cache
 ## 📄 许可证
 
 本项目采用MIT许可证，详见LICENSE文件。
+
+## 🔄 版本历史
+
+### v1.0.0 (最新)
+- 初始版本发布
+- 完整的生物节律计算功能
+- 个性化穿衣建议系统
+- 饮食推荐功能
+- 玛雅历法服务
+- 精确的日期计算和时区处理
+
+## 🤝 贡献指南
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 提交Pull Request
+
+## 📊 项目统计
+
+- **开发语言**: JavaScript, React
+- **框架**: Electron
+- **平台支持**: Windows, macOS（后续支持）
+- **开发时间**: 2024-2025
+- **项目类型**: 桌面应用程序

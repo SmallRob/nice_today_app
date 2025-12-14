@@ -10,6 +10,8 @@
     "build": "node build.js",
     "build:frontend": "cd frontend && npm run build",
     "build:electron": "cd electron && npm run build",
+    "test": "node integration_test.js",
+    "test:all": "node build_and_test.js",
     "dist": "npm run build && cd electron && npm run dist",
     "dist:win": "npm run build && cd electron && npm run dist:win",
     "dist:mac": "npm run build && cd electron && npm run dist:mac",
@@ -17,7 +19,11 @@
     "build:electron-app": "node scripts/build-electron-app.js",
     "install:all": "npm install && cd frontend && npm install && cd ../electron && npm install",
     "clean": "node scripts/clean-build.js",
-    "clean:build": "node scripts/clean-build.js"
+    "clean:build": "node scripts/clean-build.js",
+    "release": "node scripts/release.js",
+    "release:patch": "node scripts/release.js patch",
+    "release:minor": "node scripts/release.js minor",
+    "release:major": "node scripts/release.js major"
   },
   "keywords": [
     "biorhythm",
