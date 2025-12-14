@@ -4,6 +4,7 @@ import DressInfo from './DressInfo';
 import MayaCalendar from './MayaCalendar';
 import { unifiedService, checkSystemHealth } from '../services/desktopService';
 import { BiorhythmIcon, MayaIcon, DressIcon, IconLibrary } from './IconLibrary';
+import VersionInfo from './VersionInfo';
 
 const BiorhythmDashboard = ({ appInfo = {} }) => {
   const [loading, setLoading] = useState(true);
@@ -273,9 +274,8 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
             <div className="text-gray-600 dark:text-gray-400 text-sm">
               © 2024 生物节律生活助手. {appInfo.isDesktop ? '桌面版' : 'Web版'}
             </div>
-            <div className="flex space-x-4 mt-4 md:mt-0">
-              <span className="text-gray-500 dark:text-gray-500 text-sm">版本: v3.0</span>
-              <span className="text-gray-500 dark:text-gray-500 text-sm">本地化计算</span>
+            <div className="mt-4 md:mt-0">
+              <VersionInfo customVersion={appInfo.version} />
             </div>
           </div>
         </div>

@@ -7,7 +7,7 @@ import './index.css';
 function App() {
   const [appInfo, setAppInfo] = useState({
     isDesktop: false,
-    version: '1.0.0',
+    version: 'v1.0.0',
     status: 'loading'
   });
 
@@ -27,7 +27,7 @@ function App() {
           // #endregion
           setAppInfo({
             isDesktop: true,
-            version: window.electronAPI?.appInfo?.version || '1.0.0',
+            version: window.electronAPI?.appInfo?.version || 'v1.0.0',
             status: healthResult.success ? 'ready' : 'error',
             health: healthResult.data
           });
@@ -37,7 +37,7 @@ function App() {
           // #endregion
           setAppInfo({
             isDesktop: true,
-            version: '1.0.0',
+            version: 'v1.0.0',
             status: 'error',
             error: error.message
           });
@@ -45,7 +45,7 @@ function App() {
       } else {
         setAppInfo({
           isDesktop: false,
-          version: '1.0.0',
+          version: 'v1.0.0',
           status: 'web',
           message: 'Web版本功能受限，建议下载桌面应用以获得完整体验'
         });
@@ -79,11 +79,6 @@ function App() {
               )}
             </div>
             <div className="flex items-center space-x-4">
-              {appInfo.isDesktop && (
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  版本 {appInfo.version}
-                </div>
-              )}
               <DarkModeToggle />
             </div>
           </div>
