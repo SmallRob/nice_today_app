@@ -144,6 +144,76 @@ class JavaScriptBackendService {
     getDressInfoRange(daysBefore, daysAfter) {
         try {
             const result = unifiedService.getDressInfoRange(daysBefore, daysAfter);
+            // 确保返回的格式符合前端期望
+            // 前端期望: { success: true, data: { dress_info_list: [...], date_range: {...} } }
+            
+            // 如果result已经具有正确的结构，直接返回
+            if (result && result.dress_info_list && result.date_range) {
+                return { 
+                    success: true, 
+                    data: {
+                        dress_info_list: result.dress_info_list,
+                        date_range: result.date_range
+                    }
+                };
+            } 
+            
+            // 如果result是一个数组，转换为标准格式
+            if (result && Array.isArray(result)) {
+                // 计算日期范围
+                const currentDate = new Date();
+                const startDate = new Date(currentDate);
+                startDate.setDate(currentDate.getDate() - daysBefore);
+                const endDate = new Date(currentDate);
+                endDate.setDate(currentDate.getDate() + daysAfter);
+                
+                // 添加本地日期格式化方法
+                const formatDateLocal = (date) => {
+                    if (!date) return null;
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                };
+                
+                return {
+                    success: true,
+                    data: {
+                        dress_info_list: result,
+                        date_range: {
+                            start: formatDateLocal(startDate),
+                            end: formatDateLocal(endDate)
+                        }
+                    }
+                };
+            }
+            
+            // 如果result是另一种格式，尝试提取dress_info_list
+            if (result && result.data && result.data.dress_info_list) {
+                return {
+                    success: true,
+                    data: {
+                        dress_info_list: result.data.dress_info_list,
+                        date_range: result.data.date_range || (() => {
+                            const today = new Date();
+                            const formatDateLocal = (date) => {
+                                if (!date) return null;
+                                const year = date.getFullYear();
+                                const month = String(date.getMonth() + 1).padStart(2, '0');
+                                const day = String(date.getDate()).padStart(2, '0');
+                                return `${year}-${month}-${day}`;
+                            };
+                            return {
+                                start: formatDateLocal(today),
+                                end: formatDateLocal(today)
+                            };
+                        })()
+                    }
+                };
+            }
+            
+            // 如果以上都不匹配，返回原始结果
+            console.warn('穿搭建议范围信息格式不符合预期:', result);
             return { success: true, data: result };
         } catch (error) {
             console.error('获取穿搭建议范围信息失败:', error);

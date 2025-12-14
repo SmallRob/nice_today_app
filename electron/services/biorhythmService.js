@@ -29,6 +29,19 @@ class BiorhythmService {
     }
 
     /**
+     * 获取默认出生日期
+     * @returns {string} 默认出生日期
+     */
+    getDefaultBirthDate() {
+        // 如果有历史记录，返回最新的历史记录日期
+        if (this.historyDates && this.historyDates.length > 0) {
+            return this.historyDates[0];
+        }
+        // 否则返回默认日期
+        return "1991-01-01";
+    }
+
+    /**
      * 计算特定周期的节律值
      * @param {number} cycle - 周期天数
      * @param {number} daysSinceBirth - 出生以来的天数
@@ -48,8 +61,9 @@ class BiorhythmService {
         const birthDateObj = this.parseDate(birthDate);
         const targetDateObj = this.parseDate(targetDate);
         
-        // 计算天数差
-        const daysSinceBirth = Math.floor((targetDateObj - birthDateObj) / (1000 * 60 * 60 * 24));
+        // 计算天数差，使用更精确的方法避免时区问题
+        const timeDiff = targetDateObj.getTime() - birthDateObj.getTime();
+        const daysSinceBirth = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
         const physicalValue = this.calculateRhythmValue(this.cycles.physical, daysSinceBirth);
         const emotionalValue = this.calculateRhythmValue(this.cycles.emotional, daysSinceBirth);
@@ -103,10 +117,11 @@ class BiorhythmService {
         this.updateHistory(birthDate);
         
         const currentDate = new Date();
-        const [physical, emotional, intellectual] = this.calculateBiorhythm(birthDate, currentDate);
+        const [physical, emotional, intellectual] = this.calculateBiorhythm(birthDate, this.formatDateLocal(currentDate));
         
+        // 使用本地时间格式化日期，避免时区问题
         return {
-            date: currentDate.toISOString().split('T')[0],
+            date: this.formatDateLocal(currentDate),
             physical: physical,
             emotional: emotional,
             intellectual: intellectual
@@ -163,7 +178,7 @@ class BiorhythmService {
         // 计算每一天的节律值
         const currentDateIter = new Date(startDate);
         while (currentDateIter <= endDate) {
-            const dateStr = currentDateIter.toISOString().split('T')[0];
+            const dateStr = this.formatDateLocal(currentDateIter);
             const [physical, emotional, intellectual] = this.calculateBiorhythm(birthDate, dateStr);
             
             dates.push(dateStr);
@@ -191,10 +206,34 @@ class BiorhythmService {
         if (dateInput instanceof Date) {
             return dateInput;
         } else if (typeof dateInput === 'string') {
+            // 处理YYYY-MM-DD格式的日期字符串，按本地时间（东八区）计算
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
+                const parts = dateInput.split('-');
+                const year = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1; // 月份从0开始
+                const day = parseInt(parts[2], 10);
+                
+                // 使用本地时间创建日期，不涉及时区转换
+                // 按照用户输入的日期直接计算节律，与当前时间无关
+                return new Date(year, month, day);
+            }
             return new Date(dateInput);
         } else {
             throw new Error(`无法解析日期: ${dateInput}`);
         }
+    }
+
+    /**
+     * 格式化日期为YYYY-MM-DD字符串，按本地时间（东八区）
+     * @param {Date} date - 日期对象
+     * @returns {string} 格式化后的日期字符串
+     */
+    formatDateLocal(date) {
+        if (!date) return null;
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 }
 

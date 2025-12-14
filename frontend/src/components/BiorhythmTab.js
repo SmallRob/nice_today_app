@@ -28,6 +28,32 @@ const BiorhythmTab = ({ apiBaseUrl, apiConnected, serviceStatus, isDesktop }) =>
   // 从配置文件获取默认出生日期
   const DEFAULT_BIRTH_DATE = elementConfig.defaultBirthDate || "1991-01-01";
 
+  // 本地日期格式化方法，避免时区问题
+  const formatDateLocal = (date) => {
+    if (!date) return null;
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+// 本地日期解析方法，按用户输入的日期直接计算节律
+const parseDateLocal = (dateStr) => {
+  if (!dateStr) return null;
+  // 对于YYYY-MM-DD格式的日期，使用本地时间（东八区）解析
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const parts = dateStr.split('-');
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // 月份从0开始
+    const day = parseInt(parts[2], 10);
+    
+    // 使用本地时间创建日期，按照用户输入的日期直接计算节律
+    // 不涉及时区转换，与当前时间无关
+    return new Date(year, month, day);
+  }
+  return new Date(dateStr);
+};
+
   // 使用 useRef 来存储最新的 loadBiorhythmData 函数引用
   const loadBiorhythmDataRef = useRef(null);
 
@@ -89,7 +115,7 @@ const BiorhythmTab = ({ apiBaseUrl, apiConnected, serviceStatus, isDesktop }) =>
       // 使用桌面服务
       const birthDateStr = typeof dateToUse === 'string' 
         ? dateToUse 
-        : dateToUse.toISOString().split('T')[0];
+        : formatDateLocal(dateToUse);
       
       // #region agent log
       fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:64',message:'Calling desktop services',data:{birthDateStr},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix2',hypothesisId:'F'})}).catch(()=>{});
@@ -110,7 +136,7 @@ const BiorhythmTab = ({ apiBaseUrl, apiConnected, serviceStatus, isDesktop }) =>
       // 获取7天后数据
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 7);
-      const futureDateStr = futureDate.toISOString().split('T')[0];
+      const futureDateStr = formatDateLocal(futureDate);
       const futureResult = await desktopBiorhythmService.getDate(birthDateStr, futureDateStr);
       // #region agent log
       fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:79',message:'Future result',data:{success:futureResult.success,hasData:!!futureResult.data},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix2',hypothesisId:'F'})}).catch(()=>{});
@@ -171,7 +197,7 @@ const BiorhythmTab = ({ apiBaseUrl, apiConnected, serviceStatus, isDesktop }) =>
       
       // 如果是字符串日期，转换为Date对象并更新birthDate
       if (typeof dateToUse === 'string') {
-        setBirthDate(new Date(dateToUse));
+        setBirthDate(parseDateLocal(dateToUse));
       }
     } else {
       setError(result.error);

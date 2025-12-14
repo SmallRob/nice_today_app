@@ -232,24 +232,80 @@ const DressInfo = ({ apiBaseUrl, serviceStatus, isDesktop }) => {
   };
 
   if (loading && !selectedDressInfo) {
-    return <div className="text-center py-8 text-gray-900 dark:text-white">加载中...</div>;
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-8">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+          <div className="text-center">
+            <p className="text-lg font-medium text-gray-900 dark:text-white">正在为您分析今日五行能量...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">正在生成个性化的穿衣与饮食建议</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error && !selectedDressInfo) {
     return (
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <div className="text-center py-8 text-red-500 dark:text-red-400">{error}</div>
-        <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900 dark:bg-opacity-20 border-l-4 border-yellow-400 dark:border-yellow-600">
-          <p className="text-yellow-700 dark:text-yellow-300">
-            提示：请确保后端服务已启动，并且已实现穿衣与饮食建议API。
-          </p>
+        <div className="text-center py-8">
+          <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900 dark:bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-red-500 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-red-800 dark:text-red-300 mb-2">加载失败</h3>
+          <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+          <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900 dark:bg-opacity-20 border-l-4 border-yellow-400 dark:border-yellow-600 rounded-r-lg">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                  建议操作：
+                </p>
+                <ul className="text-sm text-yellow-700 dark:text-yellow-300 mt-1 list-disc list-inside space-y-1">
+                  <li>检查网络连接是否正常</li>
+                  <li>确认后端服务已启动</li>
+                  <li>刷新页面重新尝试加载</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <button 
+            onClick={() => loadDressInfoRange()} 
+            className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors duration-200"
+          >
+            重新加载
+          </button>
         </div>
       </div>
     );
   }
 
   if (!selectedDressInfo) {
-    return <div className="text-center py-8 text-gray-900 dark:text-white">暂无穿衣信息</div>;
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-8">
+        <div className="text-center">
+          <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">暂无穿衣信息</h3>
+          <p className="text-gray-500 dark:text-gray-400">暂时无法获取穿衣建议数据，请稍后重试</p>
+          <button 
+            onClick={() => loadDressInfoRange()} 
+            className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors duration-200"
+          >
+            重新加载
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // 获取吉祥颜色系统
