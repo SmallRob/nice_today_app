@@ -2,8 +2,8 @@ const { app, BrowserWindow, ipcMain, Menu } = require('electron')
 const path = require('path')
 const isDev = process.env.NODE_ENV === 'development'
 
-// Python后端服务模块
-const { PythonBackendService } = require('./services/pythonBackendService')
+// 使用新的JavaScript后端服务模块
+const { JavaScriptBackendService } = require('./services/javascriptBackendService')
 
 let mainWindow
 let backendService
@@ -41,9 +41,11 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
     
-    // 初始化后端服务
-    backendService = new PythonBackendService()
-    backendService.initialize()
+    // 立即初始化后端服务确保页面加载时服务已就绪
+    if (!backendService) {
+        backendService = new JavaScriptBackendService()
+        console.log('后端服务已初始化')
+    }
   })
 
   // 窗口关闭时的处理

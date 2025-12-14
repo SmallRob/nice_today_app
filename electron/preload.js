@@ -1,7 +1,21 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 // 暴露安全的API给渲染进程
+// 添加服务就绪状态检查
+let isApiReady = false;
+setTimeout(() => {
+    isApiReady = true;
+}, 100);
+// 添加服务就绪状态检查
+let isApiReady = false;
+setTimeout(() => {
+    isApiReady = true;
+}, 100);
 contextBridge.exposeInMainWorld('electronAPI', {
+  // 服务状态检查
+  isReady: () => isApiReady,
+  // 服务状态检查
+  isReady: () => isApiReady,
   // 生物节律相关API
   biorhythm: {
     getToday: (birthDate) => ipcRenderer.invoke('biorhythm:get-today', birthDate),

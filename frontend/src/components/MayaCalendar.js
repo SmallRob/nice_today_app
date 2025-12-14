@@ -411,50 +411,66 @@ const MayaCalendar = ({ apiBaseUrl }) => {
 
 
   useEffect(() => {
-    const loadMayaCalendarRange = async () => {
-      if (!apiBaseUrl) {
-        setError("API基础URL未设置，无法获取玛雅日历信息");
-        setLoading(false);
-        return;
+    // 等待服务就绪后再加载数据
+    const waitForService = async () => {
+      // 等待最多2秒让服务就绪
+      let attempts = 0;
+      const maxAttempts = 20; // 2秒 (20 * 100ms)
+      
+      while (attempts < maxAttempts) {
+        if (apiBaseUrl) {
+          loadMayaCalendarRange();
+          return;
+        }
+        
+        // 等待100ms后重试
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
       }
       
-      setLoading(true);
-      const result = await fetchMayaCalendarRange(apiBaseUrl);
-      
-      if (result.success) {
-        console.log(`API返回的玛雅日历数据: ${result.mayaInfoList.length}天`);
-        console.log('日期列表:', result.mayaInfoList.map(info => info.date));
-        
-        // 确保数据按日期排序
-        const sortedMayaInfoList = [...result.mayaInfoList].sort((a, b) => {
-          return new Date(a.date) - new Date(b.date);
-        });
-        
-        setMayaInfoList(sortedMayaInfoList);
-        setDateRange(result.dateRange);
-        
-        // 默认选择今天的数据
-        const today = new Date().toISOString().split('T')[0];
-        const todayInfo = sortedMayaInfoList.find(info => info.date === today);
-        setSelectedMayaInfo(todayInfo || sortedMayaInfoList[0]);
-        setError(null);
-        
-        // 加载历史记录
-        loadHistoryDates();
-        
-
-      } else {
-        setError(result.error);
+      // 如果超过最大尝试次数仍未就绪，仍然尝试加载
+      console.warn('服务未及时就绪，但仍尝试加载玛雅日历数据');
+      if (apiBaseUrl) {
+        loadMayaCalendarRange();
       }
-      
-      setLoading(false);
     };
-
-    if (apiBaseUrl) {
-      loadMayaCalendarRange();
-    }
+    
+    waitForService();
   }, [apiBaseUrl]);
   
+  
+  // 加载玛雅日历范围数据
+  const loadMayaCalendarRange = async () => {
+    if (!apiBaseUrl) {
+      setError("API基础URL未设置，无法获取玛雅日历信息");
+      setLoading(false);
+      return;
+    }
+    
+    setLoading(true);
+    const result = await fetchMayaCalendarRange(apiBaseUrl);
+    
+    if (result.success) {
+      console.log(`API返回的玛雅日历数据: ${result.mayaInfoList.length}天`);
+      console.log('日期列表:', result.mayaInfoList.map(info => info.date));
+      setMayaInfoList(result.mayaInfoList);
+      setDateRange(result.dateRange);
+      
+      // 默认选择今天的数据
+      const today = new Date().toISOString().split('T')[0];
+      const todayInfo = result.mayaInfoList.find(info => info.date === today);
+      setSelectedMayaInfo(todayInfo || result.mayaInfoList[0]);
+      setError(null);
+      
+      // 加载历史记录
+      loadHistoryDates();
+    } else {
+      setError(result.error);
+    }
+    
+    setLoading(false);
+  };
+
   // 加载历史记录
   const loadHistoryDates = () => {
     try {

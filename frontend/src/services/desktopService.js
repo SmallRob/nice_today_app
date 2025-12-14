@@ -1,6 +1,17 @@
 // 桌面应用专用服务 - 替代原有的API调用
 
 // 格式化日期为YYYY-MM-DD，确保时区一致
+// 检查服务是否就绪
+export const isServiceReady = () => {
+  // 在Electron环境中检查API是否就绪
+  if (isDesktopApp()) {
+    return window.electronAPI?.isReady ? window.electronAPI.isReady() : false;
+  }
+  // Web环境中总是就绪
+  return true;
+};
+
+
 export const formatDateString = (date) => {
   if (!date) return null;
   const year = date.getFullYear();

@@ -76,58 +76,70 @@ const BiorhythmTab = ({ apiBaseUrl, apiConnected }) => {
 
   // 更新 ref 以保存最新的 loadBiorhythmData 函数
   useEffect(() => {
-    loadBiorhythmDataRef.current = loadBiorhythmData;
-  }, [loadBiorhythmData]);
-
-  // 加载历史记录和数据
-  const loadHistoryAndData = useCallback(async () => {
-    const historyResult = await fetchHistoryDates(apiBaseUrl);
-    
-    if (historyResult.success) {
-      setHistoryDates(historyResult.history);
+    // 等待服务就绪后再加载数据
+    const waitForService = async () => {
+      // 等待最多2秒让服务就绪
+      let attempts = 0;
+      const maxAttempts = 20; // 2秒 (20 * 100ms)
       
-      // 如果有历史记录，加载最后一次查询的日期
-      if (historyResult.history.length > 0) {
-        console.log("加载历史记录中的最后一次查询日期:", historyResult.history[0]);
-        // 使用 ref 中存储的最新函数
-        if (loadBiorhythmDataRef.current) {
-          loadBiorhythmDataRef.current(historyResult.history[0]);
+      while (attempts < maxAttempts) {
+        if (loadBiorhythmDataRef.current && apiBaseUrl && apiConnected) {
+          // 使用 setTimeout 确保在下一个事件循环中执行，避免初始化时的循环调用
+          const timer = setTimeout(() => {
+            loadHistoryAndData();
+          }, 0);
+          return () => clearTimeout(timer);
+        } else if (!apiConnected) {
+          // 如果API未连接，使用默认日期但不发送请求
+          setIsDefaultDate(true);
+          setBirthDate(new Date(DEFAULT_BIRTH_DATE));
+          return;
         }
-      } else {
-        // 如果没有历史记录，加载默认日期
-        console.log("没有历史记录，加载默认日期:", DEFAULT_BIRTH_DATE);
-        setIsDefaultDate(true);
-        // 使用 ref 中存储的最新函数
-        if (loadBiorhythmDataRef.current) {
-          loadBiorhythmDataRef.current(DEFAULT_BIRTH_DATE);
-        }
+        
+        // 等待100ms后重试
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
       }
-    } else {
-      // 如果获取历史记录失败，加载默认日期
-      console.log("获取历史记录失败，加载默认日期:", DEFAULT_BIRTH_DATE);
-      setIsDefaultDate(true);
-      // 使用 ref 中存储的最新函数
+      
+      // 如果超过最大尝试次数仍未就绪，仍然尝试加载
+      console.warn('服务未及时就绪，但仍尝试加载数据');
       if (loadBiorhythmDataRef.current) {
-        loadBiorhythmDataRef.current(DEFAULT_BIRTH_DATE);
+        const timer = setTimeout(() => {
+          loadHistoryAndData();
+        }, 0);
+        return () => clearTimeout(timer);
       }
-    }
-  }, [apiBaseUrl, setIsDefaultDate, DEFAULT_BIRTH_DATE]);
+    };
+    
+    waitForService();
+  }, [apiBaseUrl, apiConnected, DEFAULT_BIRTH_DATE]);
 
-  // 组件挂载时加载历史记录和数据
-  useEffect(() => {
-    // 确保 loadBiorhythmDataRef.current 已经被设置
-    if (loadBiorhythmDataRef.current && apiBaseUrl && apiConnected) {
-      // 使用 setTimeout 确保在下一个事件循环中执行，避免初始化时的循环调用
-      const timer = setTimeout(() => {
-        loadHistoryAndData();
-      }, 0);
-      return () => clearTimeout(timer);
-    } else if (!apiConnected) {
-      // 如果API未连接，使用默认日期但不发送请求
-      setIsDefaultDate(true);
-      setBirthDate(new Date(DEFAULT_BIRTH_DATE));
+  
+  // 加载历史记录和数据
+  const loadHistoryAndData = async () => {
+    if (!apiBaseUrl || !apiConnected) return;
+    
+    try {
+      // 获取历史记录
+      const historyResult = await fetchHistoryDates(apiBaseUrl);
+      if (historyResult.success) {
+        setHistoryDates(historyResult.history);
+      }
+      
+      // 加载默认数据
+      if (birthDate) {
+        await loadBiorhythmData(birthDate);
+      } else {
+        // 使用默认日期
+        const defaultDate = new Date(DEFAULT_BIRTH_DATE);
+        setBirthDate(defaultDate);
+        setIsDefaultDate(true);
+        await loadBiorhythmData(defaultDate);
+      }
+    } catch (error) {
+      console.error('加载历史记录和数据失败:', error);
     }
-  }, [apiBaseUrl, apiConnected, loadHistoryAndData, DEFAULT_BIRTH_DATE]);
+  };
 
   // 处理日期选择变化
   const handleDateChange = (date) => {

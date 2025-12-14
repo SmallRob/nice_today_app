@@ -84,9 +84,5 @@
       "Categories": "Education;Science;",
       "Keywords": "biorhythm;maya;calendar;health;"
     }
-  },
-  "publish": {
-    "provider": "github",
-    "releaseType": "release"
   }
 }

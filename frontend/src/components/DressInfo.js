@@ -12,36 +12,61 @@ const DressInfo = ({ apiBaseUrl }) => {
   const [dateRange, setDateRange] = useState({ start: null, end: null });
 
   useEffect(() => {
-    const loadDressInfoRange = async () => {
-      if (!apiBaseUrl) {
-        setError("API基础URL未设置，无法获取穿衣信息");
-        setLoading(false);
-        return;
-      }
+    // 等待服务就绪后再加载数据
+    const waitForService = async () => {
+      // 等待最多2秒让服务就绪
+      let attempts = 0;
+      const maxAttempts = 20; // 2秒 (20 * 100ms)
       
-      setLoading(true);
-      const result = await fetchDressInfoRange(apiBaseUrl);
-      
-      if (result.success) {
-        setDressInfoList(result.dressInfoList);
-        setDateRange(result.dateRange);
+      while (attempts < maxAttempts) {
+        if (apiBaseUrl) {
+          loadDressInfoRange();
+          return;
+        }
         
-        // 默认选择今天的数据
-        const today = new Date().toISOString().split('T')[0];
-        const todayInfo = result.dressInfoList.find(info => info.date === today);
-        setSelectedDressInfo(todayInfo || result.dressInfoList[0]);
-        setError(null);
-      } else {
-        setError(result.error);
+        // 等待100ms后重试
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
       }
       
-      setLoading(false);
+      // 如果超过最大尝试次数仍未就绪，仍然尝试加载
+      console.warn('服务未及时就绪，但仍尝试加载穿搭建议数据');
+      if (apiBaseUrl) {
+        loadDressInfoRange();
+      }
     };
-
-    if (apiBaseUrl) {
-      loadDressInfoRange();
-    }
+    
+    waitForService();
   }, [apiBaseUrl]);
+
+  
+  // 加载穿搭建议范围数据
+  const loadDressInfoRange = async () => {
+    if (!apiBaseUrl) {
+      setError("API基础URL未设置，无法获取穿搭建议信息");
+      setLoading(false);
+      return;
+    }
+    
+    setLoading(true);
+    const result = await fetchDressInfoRange(apiBaseUrl);
+    
+    if (result.success) {
+      console.log(`API返回的穿搭建议数据: ${result.dressInfoList.length}天`);
+      setDressInfoList(result.dressInfoList);
+      setDateRange(result.dateRange);
+      
+      // 默认选择今天的数据
+      const today = new Date().toISOString().split('T')[0];
+      const todayInfo = result.dressInfoList.find(info => info.date === today);
+      setSelectedDressInfo(todayInfo || result.dressInfoList[0]);
+      setError(null);
+    } else {
+      setError(result.error);
+    }
+    
+    setLoading(false);
+  };
 
   // 处理日期选择
   const handleDateChange = (date) => {
