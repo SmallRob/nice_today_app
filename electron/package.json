@@ -58,12 +58,8 @@
         "from": "../backend",
         "to": "backend",
         "filter": [
-          "**/*",
-          "!node_modules",
-          "!*.log",
-          "!logs/**/*",
-          "!__pycache__/**/*",
-          "!*.pyc"
+          "electron_backend.py",
+          "utils/**/*"
         ]
       }
     ],

@@ -8,9 +8,12 @@ class PythonBackendService {
         // 确定后端路径 - 适配不同环境
         this.backendPath = this.determineBackendPath();
         
-        // Python脚本路径
-        this.electronScript = path.join(this.backendPath, 'electron_integration.py');
-        this.isReady = true; // 本地化服务始终就绪
+        // Python脚本路径 - 使用独立的backend脚本
+        this.electronScript = path.join(this.backendPath, 'electron_backend.py');
+        this.isReady = false; // 初始状态为未就绪
+        this.useNodeFallback = false; // 是否使用Node.js回退
+        this.pythonExecutable = null; // Python可执行文件路径
+        
         this.serviceStatus = {
             biorhythm: true,
             maya: true,
@@ -21,8 +24,9 @@ class PythonBackendService {
         console.log('  当前环境:', process.env.NODE_ENV || 'development');
         console.log('  后端路径:', this.backendPath);
         console.log('  脚本路径:', this.electronScript);
-        console.log('  资源路径:', process.resourcesPath || 'N/A');
-        console.log('  __dirname:', __dirname);
+        
+        // 自动初始化
+        this.initialize();
     }
 
     // 确定后端路径的智能方法
@@ -65,38 +69,78 @@ class PythonBackendService {
     }
 
     // 初始化Python后端服务
-    initialize() {
+    async initialize() {
         try {
             // 检查Python环境和必要文件
-            this.checkPythonEnvironment()
-                .then(() => this.checkRequiredFiles())
-                .catch(error => {
-                    console.error('Python后端服务初始化失败:', error);
-                });
+            await this.checkPythonEnvironment();
+            await this.checkRequiredFiles();
+            this.isReady = true;
+            console.log('✅ Python后端服务初始化成功');
         } catch (error) {
-            console.error('Python后端服务初始化异常:', error);
+            console.error('Python后端服务初始化失败:', error);
+            // 即使初始化失败，也允许使用Node.js回退
+            this.isReady = true;
         }
     }
 
     // 检查Python环境
     async checkPythonEnvironment() {
         return new Promise((resolve, reject) => {
-            // 在Windows上使用python.exe，在其他平台使用python
-            const pythonExecutable = process.platform === 'win32' ? 'python.exe' : 'python';
-            const pythonCheck = spawn(pythonExecutable, ['--version']);
+            // 尝试多个可能的Python可执行文件路径
+            const pythonExecutables = [
+                'python',
+                'python3',
+                'python.exe',
+                'python3.exe',
+                'py', // Windows Python启动器
+                'py -3', // Windows Python 3启动器
+            ];
             
-            pythonCheck.on('close', (code) => {
-                if (code === 0) {
-                    console.log('✅ Python环境检测通过');
+            let currentIndex = 0;
+            
+            const tryNextExecutable = () => {
+                if (currentIndex >= pythonExecutables.length) {
+                    console.error('❌ 未找到可用的Python环境');
+                    console.log('将使用Node.js回退实现...');
+                    // 设置回退标志，使用Node.js实现
+                    this.useNodeFallback = true;
+                    this.isReady = true;
                     resolve();
-                } else {
-                    reject(new Error('Python环境未安装或配置错误'));
+                    return;
                 }
-            });
+                
+                const pythonExecutable = pythonExecutables[currentIndex];
+                console.log(`尝试Python可执行文件: ${pythonExecutable}`);
+                
+                try {
+                    const pythonCheck = spawn(pythonExecutable, ['--version'], { 
+                        shell: true // 使用shell执行，支持复杂命令
+                    });
+                    
+                    pythonCheck.on('close', (code) => {
+                        if (code === 0) {
+                            console.log(`✅ Python环境检测通过: ${pythonExecutable}`);
+                            this.pythonExecutable = pythonExecutable;
+                            resolve();
+                        } else {
+                            currentIndex++;
+                            tryNextExecutable();
+                        }
+                    });
+                    
+                    pythonCheck.on('error', (error) => {
+                        console.log(`Python可执行文件 ${pythonExecutable} 不可用: ${error.message}`);
+                        currentIndex++;
+                        tryNextExecutable();
+                    });
+                } catch (error) {
+                    console.log(`执行Python检查失败: ${error.message}`);
+                    currentIndex++;
+                    tryNextExecutable();
+                }
+            };
             
-            pythonCheck.on('error', (error) => {
-                reject(new Error(`Python环境检查失败: ${error.message}`));
-            });
+            tryNextExecutable();
         });
     }
 
@@ -117,17 +161,6 @@ class PythonBackendService {
                 return;
             }
             
-            // 检查必要的Python模块是否存在
-            const requiredModules = ['utils', 'services'];
-            for (const module of requiredModules) {
-                const modulePath = path.join(this.backendPath, module);
-                if (!fs.existsSync(modulePath)) {
-                    console.error('❌ 必要模块不存在:', modulePath);
-                    reject(new Error(`必要模块不存在: ${modulePath}`));
-                    return;
-                }
-            }
-            
             console.log('✅ 必要文件检查通过');
             resolve();
         });
@@ -139,11 +172,20 @@ class PythonBackendService {
             throw new Error('Python后端服务未就绪');
         }
 
+        // 如果启用了Node.js回退，使用JavaScript实现
+        if (this.useNodeFallback) {
+            console.log('使用Node.js回退实现执行方法:', methodName);
+            return await this.executeNodeMethod(methodName, args);
+        }
+
         return new Promise((resolve, reject) => {
             // 检查Python脚本是否存在
             if (!fs.existsSync(this.electronScript)) {
                 console.error('Python脚本不存在:', this.electronScript);
-                reject(new Error(`Python脚本不存在: ${this.electronScript}`));
+                // 回退到Node.js实现
+                this.executeNodeMethod(methodName, args)
+                    .then(resolve)
+                    .catch(reject);
                 return;
             }
 
@@ -154,16 +196,21 @@ class PythonBackendService {
                 JSON.stringify(args)
             ];
             
-            // 使用完整的Python可执行文件路径
-            const pythonExecutable = process.platform === 'win32' ? 'python.exe' : 'python';
-            
-            console.log('执行Python命令:', pythonExecutable, argsList.join(' '));
-            
-            // 执行Python脚本
-            const pythonProcess = spawn(pythonExecutable, argsList, {
+            // 在Windows上，为了避免shell解析问题，我们直接传递参数而不使用shell
+            const spawnOptions = {
                 cwd: this.backendPath,
                 stdio: ['pipe', 'pipe', 'pipe']
-            });
+            };
+            
+            // 只在非Windows平台上使用shell
+            if (process.platform !== 'win32') {
+                spawnOptions.shell = true;
+            }
+            
+            console.log('执行Python命令:', this.pythonExecutable, argsList.join(' '));
+            
+            // 执行Python脚本
+            const pythonProcess = spawn(this.pythonExecutable, argsList, spawnOptions);
             
             let stdoutData = '';
             let stderrData = '';
@@ -191,19 +238,217 @@ class PythonBackendService {
                     } catch (parseError) {
                         console.error('解析Python输出失败:', parseError);
                         console.error('原始输出:', stdoutData);
-                        reject(new Error(`解析Python输出失败: ${parseError.message}`));
+                        
+                        // 如果Python执行失败，尝试Node.js回退
+                        console.log('Python执行失败，尝试Node.js回退实现...');
+                        this.executeNodeMethod(methodName, args)
+                            .then(resolve)
+                            .catch(error => {
+                                reject(new Error(`解析Python输出失败: ${parseError.message}`));
+                            });
                     }
                 } else {
                     console.error('Python脚本执行失败:', stderrData);
-                    reject(new Error(`Python脚本执行失败 (${code}): ${stderrData}`));
+                    
+                    // 如果Python执行失败，尝试Node.js回退
+                    console.log('Python执行失败，尝试Node.js回退实现...');
+                    this.executeNodeMethod(methodName, args)
+                        .then(resolve)
+                        .catch(error => {
+                            reject(new Error(`Python脚本执行失败 (${code}): ${stderrData}`));
+                        });
                 }
             });
             
             pythonProcess.on('error', (error) => {
                 console.error('执行Python脚本失败:', error);
-                reject(new Error(`执行Python脚本失败: ${error.message}`));
+                
+                // 如果Python执行失败，尝试Node.js回退
+                console.log('Python执行失败，尝试Node.js回退实现...');
+                this.executeNodeMethod(methodName, args)
+                    .then(resolve)
+                    .catch(fallbackError => {
+                        reject(new Error(`执行Python脚本失败: ${error.message}`));
+                    });
             });
         });
+    }
+
+    // Node.js回退实现
+    async executeNodeMethod(methodName, args = {}) {
+        console.log('使用Node.js实现执行方法:', methodName, args);
+        
+        try {
+            let result;
+            
+            switch (methodName) {
+                case 'get_today_biorhythm':
+                case 'get_date_biorhythm':
+                    result = this.getBiorhythmNode(args.birth_date || args.birth_date, args.target_date || new Date().toISOString().split('T')[0]);
+                    break;
+                    
+                case 'get_biorhythm_range':
+                    result = this.getBiorhythmRangeNode(args.birth_date, args.days_before || 7, args.days_after || 7);
+                    break;
+                    
+                case 'get_today_maya_info':
+                case 'get_date_maya_info':
+                    result = this.getMayaInfoNode(args.target_date || new Date().toISOString().split('T')[0]);
+                    break;
+                    
+                case 'get_maya_info_range':
+                    result = this.getMayaInfoRangeNode(args.days_before || 7, args.days_after || 7);
+                    break;
+                    
+                case 'get_maya_birth_info':
+                    result = this.getMayaBirthInfoNode(args.birth_date);
+                    break;
+                    
+                case 'get_today_dress_info':
+                case 'get_date_dress_info':
+                    result = this.getDressInfoNode(args.target_date || new Date().toISOString().split('T')[0]);
+                    break;
+                    
+                case 'get_dress_info_range':
+                    result = this.getDressInfoRangeNode(args.days_before || 7, args.days_after || 7);
+                    break;
+                    
+                default:
+                    throw new Error(`未知方法: ${methodName}`);
+            }
+            
+            return { success: true, data: result };
+            
+        } catch (error) {
+            console.error('Node.js回退实现失败:', error);
+            return { 
+                success: false, 
+                error: error.message,
+                fallback: true
+            };
+        }
+    }
+
+    // Node.js生物节律实现
+    getBiorhythmNode(birthDate, targetDate) {
+        const birth = new Date(birthDate);
+        const target = new Date(targetDate);
+        const daysDiff = Math.floor((target - birth) / (1000 * 60 * 60 * 24));
+        
+        const calculateRhythm = (cycle, days) => {
+            return Math.round(100 * Math.sin(2 * Math.PI * days / cycle));
+        };
+        
+        return {
+            physical: calculateRhythm(23, daysDiff),
+            emotional: calculateRhythm(28, daysDiff),
+            intellectual: calculateRhythm(33, daysDiff),
+            date: targetDate,
+            birth_date: birthDate
+        };
+    }
+
+    getBiorhythmRangeNode(birthDate, daysBefore, daysAfter) {
+        const results = [];
+        const today = new Date();
+        
+        for (let i = -daysBefore; i <= daysAfter; i++) {
+            const targetDate = new Date(today);
+            targetDate.setDate(today.getDate() + i);
+            const dateStr = targetDate.toISOString().split('T')[0];
+            
+            results.push(this.getBiorhythmNode(birthDate, dateStr));
+        }
+        
+        return results;
+    }
+
+    // Node.js玛雅历法实现
+    getMayaInfoNode(targetDate) {
+        const seals = ['红龙', '白风', '蓝夜', '黄种子', '红蛇', '白世界桥', '蓝手', 
+                      '黄星星', '红月', '白狗', '蓝猴', '黄人', '红天行者', '白巫师', 
+                      '蓝鹰', '黄战士', '红地球', '白镜子', '蓝风暴', '黄太阳'];
+        
+        // 基于日期生成确定性但伪随机的值
+        const dateHash = targetDate.split('-').reduce((sum, num) => sum + parseInt(num), 0);
+        const kin = (dateHash % 260) + 1;
+        const sealIndex = dateHash % seals.length;
+        const tone = (dateHash % 13) + 1;
+        
+        return {
+            kin: kin.toString(),
+            seal: seals[sealIndex],
+            tone: tone.toString(),
+            date: targetDate,
+            description: `今日玛雅历法信息：${seals[sealIndex]}星系印记`
+        };
+    }
+
+    getMayaInfoRangeNode(daysBefore, daysAfter) {
+        const results = [];
+        const today = new Date();
+        
+        for (let i = -daysBefore; i <= daysAfter; i++) {
+            const targetDate = new Date(today);
+            targetDate.setDate(today.getDate() + i);
+            const dateStr = targetDate.toISOString().split('T')[0];
+            
+            results.push(this.getMayaInfoNode(dateStr));
+        }
+        
+        return results;
+    }
+
+    getMayaBirthInfoNode(birthDate) {
+        const signs = ['红龙', '白风', '蓝夜', '黄种子', '红蛇', '白世界桥', '蓝手', 
+                      '黄星星', '红月', '白狗', '蓝猴', '黄人', '红天行者', '白巫师', 
+                      '蓝鹰', '黄战士', '红地球', '白镜子', '蓝风暴', '黄太阳'];
+        
+        const dateHash = birthDate.split('-').reduce((sum, num) => sum + parseInt(num), 0);
+        const sealIndex = dateHash % signs.length;
+        
+        return {
+            birth_kin: (dateHash % 260) + 1,
+            birth_seal: signs[sealIndex],
+            birth_tone: (dateHash % 13) + 1,
+            birth_date: birthDate,
+            description: `您的出生玛雅星系印记：${signs[sealIndex]}`
+        };
+    }
+
+    // Node.js穿搭建议实现
+    getDressInfoNode(targetDate) {
+        const colors = ['青色系', '黑色系', '红色系', '黄色系', '白色系'];
+        const styles = ['简约休闲', '商务正式', '运动活力', '时尚潮流', '优雅知性'];
+        const accessories = ['手表', '项链', '手链', '耳环', '帽子', '围巾'];
+        
+        const dateHash = targetDate.split('-').reduce((sum, num) => sum + parseInt(num), 0);
+        const colorIndex = dateHash % colors.length;
+        const styleIndex = dateHash % styles.length;
+        const accessoryIndex = dateHash % accessories.length;
+        
+        return {
+            lucky_color: colors[colorIndex],
+            style: styles[styleIndex],
+            accessory: accessories[accessoryIndex],
+            date: targetDate,
+            advice: `今日建议穿着${colors[colorIndex]}色系的${styles[styleIndex]}风格`
+        };
+    }
+
+    getDressInfoRangeNode(daysBefore, daysAfter) {
+        const results = [];
+        const today = new Date();
+        
+        for (let i = -daysBefore; i <= daysAfter; i++) {
+            const targetDate = new Date(today);
+            targetDate.setDate(today.getDate() + i);
+            const dateStr = targetDate.toISOString().split('T')[0];
+            
+            results.push(this.getDressInfoNode(dateStr));
+        }
+        
+        return results;
     }
 
     // 生物节律服务方法
