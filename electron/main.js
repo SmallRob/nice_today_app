@@ -179,6 +179,34 @@ ipcMain.handle('biorhythm:get-range', async (event, birthDate, daysBefore, daysA
   }
 })
 
+// 生物节律历史记录相关
+ipcMain.handle('biorhythm:get-history', async () => {
+  try {
+    return await backendService.getBiorhythmHistory()
+  } catch (error) {
+    console.error('生物节律历史记录获取失败:', error)
+    throw error
+  }
+})
+
+ipcMain.handle('biorhythm:clear-history', async () => {
+  try {
+    return await backendService.clearBiorhythmHistory()
+  } catch (error) {
+    console.error('清除生物节律历史记录失败:', error)
+    throw error
+  }
+})
+
+ipcMain.handle('biorhythm:remove-history', async (event, birthDate) => {
+  try {
+    return await backendService.removeBiorhythmHistory(birthDate)
+  } catch (error) {
+    console.error('删除生物节律历史记录失败:', error)
+    throw error
+  }
+})
+
 // IPC通信处理 - 玛雅历法相关
 ipcMain.handle('maya:get-today', async () => {
   try {

@@ -1,4 +1,5 @@
 const { configLoader } = require('./configLoader');
+const { userConfigManager } = require('./userConfigManager');
 
 /**
  * 生物节律服务
@@ -10,8 +11,21 @@ class BiorhythmService {
         this.cycles = configLoader.getBiorhythmConfig().cycles;
         this.maxHistory = configLoader.getBiorhythmConfig().max_history;
         
-        // 存储用户历史查询的出生日期
-        this.historyDates = [];
+        // 加载用户历史记录
+        this.loadHistoryFromConfig();
+    }
+
+    /**
+     * 从用户配置加载历史记录
+     */
+    loadHistoryFromConfig() {
+        try {
+            const historyItems = userConfigManager.getBiorhythmHistory();
+            this.historyDates = [...historyItems];
+        } catch (error) {
+            console.error('加载历史记录失败:', error);
+            this.historyDates = [];
+        }
     }
 
     /**
@@ -61,6 +75,13 @@ class BiorhythmService {
         // 保持列表长度不超过MAX_HISTORY
         if (this.historyDates.length > this.maxHistory) {
             this.historyDates = this.historyDates.slice(0, this.maxHistory);
+        }
+
+        // 保存到用户配置
+        try {
+            userConfigManager.addBiorhythmHistory(birthDate);
+        } catch (error) {
+            console.error('保存历史记录失败:', error);
         }
     }
 

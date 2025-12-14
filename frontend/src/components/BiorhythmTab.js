@@ -31,6 +31,27 @@ const BiorhythmTab = ({ apiBaseUrl, apiConnected, serviceStatus, isDesktop }) =>
   // 使用 useRef 来存储最新的 loadBiorhythmData 函数引用
   const loadBiorhythmDataRef = useRef(null);
 
+  // 获取历史记录
+  const loadHistoryDates = useCallback(async () => {
+    if (isDesktop && isDesktopApp()) {
+      try {
+        // 在桌面环境下，通过Electron API获取历史记录
+        const historyResult = await window.electronAPI.biorhythm.getHistory();
+        if (historyResult.success && historyResult.data) {
+          setHistoryDates(historyResult.data);
+        }
+      } catch (error) {
+        console.error('获取历史记录失败:', error);
+      }
+    } else if (apiBaseUrl) {
+      // Web环境下使用原有的API
+      const historyResult = await fetchHistoryDates(apiBaseUrl);
+      if (historyResult.success) {
+        setHistoryDates(historyResult.history);
+      }
+    }
+  }, [isDesktop, apiBaseUrl]);
+
   // 加载生物节律数据
   const loadBiorhythmData = useCallback(async (selectedDate = null) => {
     // 使用函数参数或当前状态
@@ -131,10 +152,16 @@ const BiorhythmTab = ({ apiBaseUrl, apiConnected, serviceStatus, isDesktop }) =>
       setTodayData(result.todayData);
       setFutureData(result.futureData);
       
-      // 如果不是使用默认日期，则更新历史记录（仅Web环境）
-      if (!isDesktop && !isDefaultDate && apiBaseUrl) {
-        if (typeof dateToUse !== 'string' || dateToUse !== DEFAULT_BIRTH_DATE) {
-          setIsDefaultDate(false);
+      // 更新历史记录
+      if (!isDefaultDate) {
+        setIsDefaultDate(false);
+        
+        if (isDesktop && isDesktopApp()) {
+          // 在桌面环境下，历史记录会自动通过后端服务保存
+          // 这里只需要更新前端的历史记录显示
+          await loadHistoryDates();
+        } else if (apiBaseUrl) {
+          // Web环境下使用原有的API
           const historyResult = await fetchHistoryDates(apiBaseUrl);
           if (historyResult.success) {
             setHistoryDates(historyResult.history);
