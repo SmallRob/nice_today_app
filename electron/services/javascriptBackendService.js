@@ -9,7 +9,8 @@ class JavaScriptBackendService {
             biorhythm: true,
             maya: true,
             dress: true,
-            seasonHealth: true
+            seasonHealth: true,
+            zodiacEnergy: true
         };
         
         console.log('JavaScript后端服务初始化');
@@ -239,6 +240,10 @@ class JavaScriptBackendService {
         return this.serviceStatus.seasonHealth;
     }
 
+    isZodiacEnergyServiceReady() {
+        return this.serviceStatus.zodiacEnergy;
+    }
+
     // ==================== 四季五行养生相关接口 ====================
 
     /**
@@ -252,6 +257,68 @@ class JavaScriptBackendService {
             return { success: true, data: result };
         } catch (error) {
             console.error('获取四季五行养生建议失败:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // ==================== 生肖能量相关接口 ====================
+
+    /**
+     * 获取今日生肖能量指引
+     * @param {string} userZodiac - 用户生肖
+     * @returns {Object} 今日能量指引
+     */
+    getTodayZodiacEnergy(userZodiac) {
+        try {
+            const result = unifiedService.getTodayZodiacEnergy(userZodiac);
+            return { success: true, data: result };
+        } catch (error) {
+            console.error('获取今日生肖能量指引失败:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * 获取指定日期的生肖能量指引
+     * @param {string} userZodiac - 用户生肖
+     * @param {string} targetDate - 目标日期 (YYYY-MM-DD)
+     * @returns {Object} 指定日期能量指引
+     */
+    getDateZodiacEnergy(userZodiac, targetDate) {
+        try {
+            const result = unifiedService.getDateZodiacEnergy(userZodiac, targetDate);
+            return { success: true, data: result };
+        } catch (error) {
+            console.error('获取指定日期生肖能量指引失败:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * 根据年份计算生肖
+     * @param {number} year - 年份
+     * @returns {string} 生肖
+     */
+    getZodiacFromYear(year) {
+        try {
+            const result = unifiedService.getZodiacFromYear(year);
+            return { success: true, data: result };
+        } catch (error) {
+            console.error('根据年份计算生肖失败:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * 获取所有生肖列表
+     * @returns {Array} 生肖列表
+     */
+    getAllZodiacs() {
+        try {
+            const result = unifiedService.getAllZodiacs();
+            return { success: true, data: result };
+        } catch (error) {
+            console.error('获取所有生肖列表失败:', error);
             return { success: false, error: error.message };
         }
     }

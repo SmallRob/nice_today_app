@@ -45,6 +45,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getAdvice: (date) => ipcRenderer.invoke('seasonHealth:get-advice', date)
   },
 
+  // 生肖能量相关API
+  zodiacEnergy: {
+    getToday: (userZodiac) => ipcRenderer.invoke('zodiacEnergy:get-today', userZodiac),
+    getDate: (userZodiac, targetDate) => ipcRenderer.invoke('zodiacEnergy:get-date', userZodiac, targetDate),
+    getZodiacFromYear: (year) => ipcRenderer.invoke('zodiacEnergy:get-zodiac-from-year', year),
+    getAllZodiacs: () => ipcRenderer.invoke('zodiacEnergy:get-all-zodiacs')
+  },
+
   // 系统相关API
   system: {
     healthCheck: () => ipcRenderer.invoke('system:health-check')

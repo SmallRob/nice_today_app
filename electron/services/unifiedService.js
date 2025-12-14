@@ -2,6 +2,7 @@ const { biorhythmService } = require('./biorhythmService');
 const { mayaService } = require('./mayaService');
 const { dressService } = require('./dressService');
 const { seasonHealthService } = require('./seasonHealthService');
+const { zodiacEnergyService } = require('./zodiacEnergyService');
 
 /**
  * 统一服务
@@ -13,6 +14,7 @@ class UnifiedService {
         this.mayaService = mayaService;
         this.dressService = dressService;
         this.seasonHealthService = seasonHealthService;
+        this.zodiacEnergyService = zodiacEnergyService;
     }
 
     // ==================== 生物节律相关接口 ====================
@@ -144,6 +146,44 @@ class UnifiedService {
         return this.seasonHealthService.getSeasonHealthAdvice(date);
     }
 
+    // ==================== 生肖能量相关接口 ====================
+    
+    /**
+     * 获取今日生肖能量指引
+     * @param {string} userZodiac - 用户生肖
+     * @returns {Object} 今日能量指引
+     */
+    getTodayZodiacEnergy(userZodiac) {
+        return this.zodiacEnergyService.getTodayEnergyGuidance(userZodiac);
+    }
+
+    /**
+     * 获取指定日期的生肖能量指引
+     * @param {string} userZodiac - 用户生肖
+     * @param {string} date - 目标日期 (YYYY-MM-DD)
+     * @returns {Object} 指定日期能量指引
+     */
+    getDateZodiacEnergy(userZodiac, date) {
+        return this.zodiacEnergyService.getDateEnergyGuidance(userZodiac, date);
+    }
+
+    /**
+     * 根据年份计算生肖
+     * @param {number} year - 年份
+     * @returns {string} 生肖
+     */
+    getZodiacFromYear(year) {
+        return this.zodiacEnergyService.getZodiacFromYear(year);
+    }
+
+    /**
+     * 获取所有生肖列表
+     * @returns {Array} 生肖列表
+     */
+    getAllZodiacs() {
+        return this.zodiacEnergyService.getAllZodiacs();
+    }
+
     // ==================== 系统接口 ====================
     
     /**
@@ -158,7 +198,9 @@ class UnifiedService {
             "services": {
                 "biorhythm": true,
                 "maya": true,
-                "dress": true
+                "dress": true,
+                "seasonHealth": true,
+                "zodiacEnergy": true
             }
         };
     }

@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 import BiorhythmTab from './BiorhythmTab';
 import DressInfo from './DressInfo';
 import MayaCalendar from './MayaCalendar';
+import ZodiacEnergyTab from './ZodiacEnergyTab';
 import { unifiedService, checkSystemHealth } from '../services/desktopService';
 import { BiorhythmIcon, MayaIcon, DressIcon, IconLibrary } from './IconLibrary';
 import VersionInfo from './VersionInfo';
+
+// 生肖能量图标组件
+const ZodiacIcon = (props) => <IconLibrary.Icon name="zodiac" {...props} />;
 
 const BiorhythmDashboard = ({ appInfo = {} }) => {
   const [loading, setLoading] = useState(true);
@@ -12,7 +16,9 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
   const [serviceStatus, setServiceStatus] = useState({
     biorhythm: false,
     maya: false,
-    dress: false
+    dress: false,
+    // zodiacEnergy状态已临时移除，但保留以便将来可能需要恢复
+    // zodiacEnergy: false
   });
 
   // 检测服务状态
@@ -26,7 +32,9 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
           setServiceStatus({
             biorhythm: healthResult.data.services?.biorhythm || false,
             maya: healthResult.data.services?.maya || false,
-            dress: healthResult.data.services?.dress || false
+            dress: healthResult.data.services?.dress || false,
+            // zodiacEnergy状态已临时移除，但保留以便将来可能需要恢复
+            // zodiacEnergy: healthResult.data.services?.zodiacEnergy || false
           });
         }
       } catch (error) {
@@ -37,7 +45,9 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
       setServiceStatus({
         biorhythm: true,
         maya: true,
-        dress: true
+        dress: true,
+        // zodiacEnergy状态已临时移除，但保留以便将来可能需要恢复
+        // zodiacEnergy: true
       });
     }
 
@@ -68,9 +78,17 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
       id: 'dress', 
       label: '穿衣饮食指南', 
       icon: DressIcon,
-      description: '根据玛雅能量推荐适合的穿衣颜色和饮食建议',
+      description: '根据五行能量推荐生活饮食与穿衣指南',
       color: 'green'
-    }
+    },
+    // 生肖能量指南标签已临时移除，但代码保留以便将来可能需要恢复
+    // { 
+    //   id: 'zodiac', 
+    //   label: '生肖能量指南', 
+    //   icon: ZodiacIcon,
+    //   description: '结合五行与生肖的对应关系，提供全面的生活健康建议',
+    //   color: 'purple'
+    // }
   ];
 
   if (loading) {
@@ -137,6 +155,8 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
                     {!serviceStatus.biorhythm && <li>生物节律计算服务异常</li>}
                     {!serviceStatus.maya && <li>玛雅历法计算服务异常</li>}
                     {!serviceStatus.dress && <li>穿搭建议服务异常</li>}
+                    {/* 生肖能量服务状态检查已临时移除，但代码保留以便将来可能需要恢复 */}
+                    {/* {!serviceStatus.zodiacEnergy && <li>生肖能量计算服务异常</li>} */}
                   </ul>
                   <p className="mt-1">请尝试重启应用或检查系统环境。</p>
                 </div>
@@ -194,12 +214,20 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
                 isDesktop={appInfo.isDesktop}
               />
             )}
+            
+            {/* 生肖能量标签内容已临时移除，但代码保留以便将来可能需要恢复 */}
+            {/* {activeTab === 'zodiac' && (
+              <ZodiacEnergyTab 
+                serviceStatus={serviceStatus.zodiacEnergy}
+                isDesktop={appInfo.isDesktop}
+              />
+            )} */}
           </div>
         </div>
 
         {/* 功能说明卡片 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {tabs.map((tab) => (
+          {tabs.filter(tab => tab.id !== 'zodiac').map((tab) => (
             <div key={tab.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6">
               <div className={`w-12 h-12 bg-${tab.color}-100 dark:bg-${tab.color}-900 dark:bg-opacity-30 rounded-full flex items-center justify-center text-${tab.color}-600 dark:text-${tab.color}-400 mb-4`}>
                 <tab.icon size={24} />
@@ -210,6 +238,18 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
               </p>
             </div>
           ))}
+          {/* 生肖能量说明卡片已临时移除，但代码保留以便将来可能需要恢复 */}
+          {/* {tabs.filter(tab => tab.id === 'zodiac').map((tab) => (
+            <div key={tab.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6">
+              <div className={`w-12 h-12 bg-${tab.color}-100 dark:bg-${tab.color}-900 dark:bg-opacity-30 rounded-full flex items-center justify-center text-${tab.color}-600 dark:text-${tab.color}-400 mb-4`}>
+                <tab.icon size={24} />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{tab.label}</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                {tab.description}
+              </p>
+            </div>
+          ))} */}
         </div>
 
         {/* 应用优势说明 */}

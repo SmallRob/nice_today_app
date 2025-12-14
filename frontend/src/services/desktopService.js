@@ -360,6 +360,97 @@ export const desktopSeasonHealthService = {
   }
 };
 
+// 生肖能量服务
+export const desktopZodiacEnergyService = {
+  // 获取今日生肖能量指引
+  getToday: async (userZodiac) => {
+    if (!isDesktopApp()) {
+      return {
+        success: false,
+        error: '请在桌面应用中运行此功能'
+      };
+    }
+
+    try {
+      const result = await window.electronAPI.zodiacEnergy.getToday(userZodiac);
+      return result;
+    } catch (error) {
+      console.error('获取今日生肖能量指引失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  },
+
+  // 获取指定日期生肖能量指引
+  getDate: async (userZodiac, targetDate) => {
+    if (!isDesktopApp()) {
+      return {
+        success: false,
+        error: '请在桌面应用中运行此功能'
+      };
+    }
+
+    try {
+      const targetDateStr = typeof targetDate === 'string' 
+        ? targetDate 
+        : formatDateString(targetDate);
+      
+      const result = await window.electronAPI.zodiacEnergy.getDate(userZodiac, targetDateStr);
+      return result;
+    } catch (error) {
+      console.error('获取指定日期生肖能量指引失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  },
+
+  // 根据年份计算生肖
+  getZodiacFromYear: async (year) => {
+    if (!isDesktopApp()) {
+      return {
+        success: false,
+        error: '请在桌面应用中运行此功能'
+      };
+    }
+
+    try {
+      const result = await window.electronAPI.zodiacEnergy.getZodiacFromYear(year);
+      return result;
+    } catch (error) {
+      console.error('根据年份计算生肖失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  },
+
+  // 获取所有生肖列表
+  getAllZodiacs: async () => {
+    if (!isDesktopApp()) {
+      return {
+        success: false,
+        error: '请在桌面应用中运行此功能'
+      };
+    }
+
+    try {
+      const result = await window.electronAPI.zodiacEnergy.getAllZodiacs();
+      return result;
+    } catch (error) {
+      console.error('获取所有生肖列表失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+};
+
 // 统一的服务接口 - 自动检测环境并选择合适的方法
 export const unifiedService = {
   // 生物节律服务
@@ -487,6 +578,53 @@ export const unifiedService = {
     getAdvice: async (date) => {
       if (isDesktopApp()) {
         return desktopSeasonHealthService.getAdvice(date);
+      } else {
+        return {
+          success: false,
+          error: '此功能仅在桌面应用中可用'
+        };
+      }
+    }
+  },
+
+  // 生肖能量服务
+  zodiacEnergy: {
+    getToday: async (userZodiac) => {
+      if (isDesktopApp()) {
+        return desktopZodiacEnergyService.getToday(userZodiac);
+      } else {
+        return {
+          success: false,
+          error: '此功能仅在桌面应用中可用'
+        };
+      }
+    },
+
+    getDate: async (userZodiac, targetDate) => {
+      if (isDesktopApp()) {
+        return desktopZodiacEnergyService.getDate(userZodiac, targetDate);
+      } else {
+        return {
+          success: false,
+          error: '此功能仅在桌面应用中可用'
+        };
+      }
+    },
+
+    getZodiacFromYear: async (year) => {
+      if (isDesktopApp()) {
+        return desktopZodiacEnergyService.getZodiacFromYear(year);
+      } else {
+        return {
+          success: false,
+          error: '此功能仅在桌面应用中可用'
+        };
+      }
+    },
+
+    getAllZodiacs: async () => {
+      if (isDesktopApp()) {
+        return desktopZodiacEnergyService.getAllZodiacs();
       } else {
         return {
           success: false,

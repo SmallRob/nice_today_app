@@ -296,6 +296,43 @@ ipcMain.handle('seasonHealth:get-advice', async (event, date) => {
   }
 })
 
+// 生肖能量相关IPC处理程序
+ipcMain.handle('zodiacEnergy:get-today', async (event, userZodiac) => {
+  try {
+    return await backendService.getTodayZodiacEnergy(userZodiac)
+  } catch (error) {
+    console.error('今日生肖能量指引获取失败:', error)
+    throw error
+  }
+})
+
+ipcMain.handle('zodiacEnergy:get-date', async (event, userZodiac, targetDate) => {
+  try {
+    return await backendService.getDateZodiacEnergy(userZodiac, targetDate)
+  } catch (error) {
+    console.error('指定日期生肖能量指引获取失败:', error)
+    throw error
+  }
+})
+
+ipcMain.handle('zodiacEnergy:get-zodiac-from-year', async (event, year) => {
+  try {
+    return await backendService.getZodiacFromYear(year)
+  } catch (error) {
+    console.error('根据年份计算生肖失败:', error)
+    throw error
+  }
+})
+
+ipcMain.handle('zodiacEnergy:get-all-zodiacs', async () => {
+  try {
+    return await backendService.getAllZodiacs()
+  } catch (error) {
+    console.error('获取所有生肖列表失败:', error)
+    throw error
+  }
+})
+
 // 系统状态检查
 ipcMain.handle('system:health-check', async () => {
   try {
@@ -307,7 +344,8 @@ ipcMain.handle('system:health-check', async () => {
         biorhythm: backendService.isBiorhythmServiceReady(),
         maya: backendService.isMayaServiceReady(),
         dress: backendService.isDressServiceReady(),
-        seasonHealth: backendService.isSeasonHealthServiceReady()
+        seasonHealth: backendService.isSeasonHealthServiceReady(),
+        zodiacEnergy: backendService.isZodiacEnergyServiceReady()
       }
     }
   } catch (error) {
