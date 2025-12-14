@@ -8,7 +8,8 @@ class JavaScriptBackendService {
         this.serviceStatus = {
             biorhythm: true,
             maya: true,
-            dress: true
+            dress: true,
+            seasonHealth: true
         };
         
         console.log('JavaScript后端服务初始化');
@@ -232,6 +233,27 @@ class JavaScriptBackendService {
 
     isDressServiceReady() {
         return this.serviceStatus.dress;
+    }
+
+    isSeasonHealthServiceReady() {
+        return this.serviceStatus.seasonHealth;
+    }
+
+    // ==================== 四季五行养生相关接口 ====================
+
+    /**
+     * 获取综合的四季五行养生建议
+     * @param {Date|string} date - 日期
+     * @returns {Object} 养生建议数据
+     */
+    getSeasonHealthAdvice(date) {
+        try {
+            const result = unifiedService.getSeasonHealthAdvice(date);
+            return { success: true, data: result };
+        } catch (error) {
+            console.error('获取四季五行养生建议失败:', error);
+            return { success: false, error: error.message };
+        }
     }
 
     // 关闭服务

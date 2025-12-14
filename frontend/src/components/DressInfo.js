@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { fetchDressInfoRange, fetchSpecificDateDressInfo, formatDateString } from '../services/apiService';
 import { desktopDressService, isDesktopApp } from '../services/desktopService';
+import { seasonHealthTips, organRhythmTips, dietHealthTips, seasonGeneralTips, warmReminders, fiveElementsInfo } from '../config/healthTipsConfig';
 
 const DressInfo = ({ apiBaseUrl, serviceStatus, isDesktop }) => {
   // #region agent log
@@ -213,6 +214,85 @@ const DressInfo = ({ apiBaseUrl, serviceStatus, isDesktop }) => {
     return `${date.getMonth() + 1}/${date.getDate()}`;
   };
 
+  // 获取当前季节名称
+  const getCurrentSeasonName = (date) => {
+    const month = date.getMonth() + 1; // 1-12
+    const day = date.getDate();
+    
+    // 根据阳历日期确定季节
+    if ((month === 2 && day >= 4) || month === 3 || month === 4 || (month === 5 && day < 5)) {
+      return "春";
+    } else if ((month === 5 && day >= 5) || month === 6 || month === 7 || (month === 8 && day < 7)) {
+      return "夏";
+    } else if ((month === 8 && day >= 7) || (month === 9 && day < 7)) {
+      return "长夏";
+    } else if ((month === 9 && day >= 7) || month === 10 || (month === 11 && day < 7)) {
+      return "秋";
+    } else {
+      return "冬";
+    }
+  };
+
+  // 获取当前季节五行
+  const getCurrentSeasonElement = (date) => {
+    const seasonName = getCurrentSeasonName(date);
+    const seasonData = seasonHealthTips[seasonName];
+    return seasonData ? seasonData.element : "";
+  };
+
+  // 获取当前季节主令脏腑
+  const getCurrentSeasonOrgans = (date) => {
+    const seasonName = getCurrentSeasonName(date);
+    const seasonData = seasonHealthTips[seasonName];
+    return seasonData ? seasonData.organs : "";
+  };
+
+  // 获取当前季节特点
+  const getCurrentSeasonCharacteristics = (date) => {
+    const seasonName = getCurrentSeasonName(date);
+    const seasonData = seasonHealthTips[seasonName];
+    return seasonData ? seasonData.characteristics : "";
+  };
+
+  // 获取当前季节养生建议
+  const getCurrentSeasonAdvice = (date) => {
+    const seasonName = getCurrentSeasonName(date);
+    const seasonData = seasonHealthTips[seasonName];
+    return seasonData ? seasonData.advice : "";
+  };
+
+  // 获取当前器官时段
+  const getCurrentOrganTime = (date) => {
+    const hour = date.getHours();
+    const index = Math.floor((hour + 1) / 2) % 12;
+    return organRhythmTips.organTimes[index];
+  };
+
+  // 获取当前器官
+  const getCurrentOrgan = (date) => {
+    const hour = date.getHours();
+    const index = Math.floor((hour + 1) / 2) % 12;
+    return organRhythmTips.organs[index];
+  };
+
+  // 获取当前器官描述
+  const getCurrentOrganDescription = (date) => {
+    const organ = getCurrentOrgan(date);
+    return organRhythmTips.organDescriptions[organ] || "";
+  };
+
+  // 获取当前器官建议
+  const getCurrentOrganSuggestion = (date) => {
+    const organ = getCurrentOrgan(date);
+    return organRhythmTips.organSuggestions[organ] || "";
+  };
+
+  // 获取当前器官健康提示
+  const getCurrentOrganHealthTip = (date) => {
+    const organ = getCurrentOrgan(date);
+    return organRhythmTips.organHealthTips[organ] || "";
+  };
+
   // 获取日期标签类名
   const getDateTabClass = (dateStr) => {
     const isSelected = selectedDressInfo && selectedDressInfo.date === dateStr;
@@ -329,31 +409,30 @@ const DressInfo = ({ apiBaseUrl, serviceStatus, isDesktop }) => {
           五行基础知识
         </h3>
         <div className="flex w-full">
-          <div className="flex-1 text-center p-3 bg-green-50 dark:bg-green-900 dark:bg-opacity-20 rounded-lg mx-1">
-            <div className="w-12 h-12 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold">木</div>
-            <p className="text-sm font-medium whitespace-nowrap text-gray-900 dark:text-white">木行</p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">生长、向上</p>
-          </div>
-          <div className="flex-1 text-center p-3 bg-red-50 dark:bg-red-900 dark:bg-opacity-20 rounded-lg mx-1">
-            <div className="w-12 h-12 bg-red-500 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold">火</div>
-            <p className="text-sm font-medium whitespace-nowrap text-gray-900 dark:text-white">火行</p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">温热、向上</p>
-          </div>
-          <div className="flex-1 text-center p-3 bg-yellow-50 dark:bg-yellow-900 dark:bg-opacity-20 rounded-lg mx-1">
-            <div className="w-12 h-12 bg-yellow-500 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold">土</div>
-            <p className="text-sm font-medium whitespace-nowrap text-gray-900 dark:text-white">土行</p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">承载、中和</p>
-          </div>
-          <div className="flex-1 text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg mx-1">
-            <div className="w-12 h-12 bg-gray-500 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold">金</div>
-            <p className="text-sm font-medium whitespace-nowrap text-gray-900 dark:text-white">金行</p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">收敛、肃杀</p>
-          </div>
-          <div className="flex-1 text-center p-3 bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20 rounded-lg mx-1">
-            <div className="w-12 h-12 bg-blue-500 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold">水</div>
-            <p className="text-sm font-medium whitespace-nowrap text-gray-900 dark:text-white">水行</p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">滋润、向下</p>
-          </div>
+          {Object.entries(fiveElementsInfo).map(([element, info]) => {
+            const bgColorMap = {
+              "木": "bg-green-50 dark:bg-green-900 dark:bg-opacity-20",
+              "火": "bg-red-50 dark:bg-red-900 dark:bg-opacity-20", 
+              "土": "bg-yellow-50 dark:bg-yellow-900 dark:bg-opacity-20",
+              "金": "bg-gray-50 dark:bg-gray-700",
+              "水": "bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20"
+            };
+            const circleColorMap = {
+              "木": "bg-green-500",
+              "火": "bg-red-500",
+              "土": "bg-yellow-500", 
+              "金": "bg-gray-500",
+              "水": "bg-blue-500"
+            };
+            
+            return (
+              <div key={element} className={`flex-1 text-center p-3 ${bgColorMap[element]} rounded-lg mx-1`}>
+                <div className={`w-12 h-12 ${circleColorMap[element]} rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold`}>{element}</div>
+                <p className="text-sm font-medium whitespace-nowrap text-gray-900 dark:text-white">{info.name}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">{info.description}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -608,10 +687,149 @@ const DressInfo = ({ apiBaseUrl, serviceStatus, isDesktop }) => {
             饮食养生小贴士
           </h5>
           <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-            <li>• 饮食宜清淡，避免过于油腻和辛辣</li>
-            <li>• 用餐时保持心情愉悦，有助于消化吸收</li>
-            <li>• 可根据个人体质适当调整，不必严格按照建议执行</li>
-            <li>• 搭配适量运动，促进新陈代谢和气血循环</li>
+            {dietHealthTips.map((tip, index) => (
+              <li key={index}>• {tip}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* 四季五行身体养生 */}
+      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <h3 className="text-xl font-semibold mb-4 flex items-center text-teal-600 dark:text-teal-400">
+          <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clipRule="evenodd" />
+          </svg>
+          四季五行身体养生
+        </h3>
+        
+        <div className="mb-4 p-4 bg-teal-50 dark:bg-teal-900 dark:bg-opacity-20 border border-teal-200 dark:border-teal-700 rounded-lg">
+          <p className="text-teal-800 dark:text-teal-300 text-sm">
+            <strong>四季养生原理：</strong>根据中医'天人相应'理论，人体五脏与四季相应，不同季节有不同的养生重点。
+            遵循四季五行规律，调整生活方式，可达到'春夏养阳，秋冬养阴'的养生效果。
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* 季节养生信息 */}
+          <div className="bg-teal-50 dark:bg-teal-900 dark:bg-opacity-20 border border-teal-200 dark:border-teal-700 rounded-lg p-5 hover:shadow-md transition-shadow">
+            <div className="flex items-center mb-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 mr-4 flex-shrink-0 flex items-center justify-center shadow-md">
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold text-teal-800 dark:text-teal-300">
+                  {getCurrentSeasonName(selectedDate)}季养生
+                </h4>
+                <p className="text-sm text-teal-600 dark:text-teal-400">当前季节的养生要点</p>
+              </div>
+            </div>
+            
+            <div className="ml-14">
+              <div className="mb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">当季五行：</span>
+                  <span className="px-3 py-1 bg-white dark:bg-gray-700 border border-teal-300 dark:border-teal-600 rounded-full text-sm font-medium text-teal-700 dark:text-teal-300">
+                    {getCurrentSeasonElement(selectedDate)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">主令脏腑：</span>
+                  <span className="px-3 py-1 bg-white dark:bg-gray-700 border border-teal-300 dark:border-teal-600 rounded-full text-sm text-teal-700 dark:text-teal-300">
+                    {getCurrentSeasonOrgans(selectedDate)}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mb-4">
+              <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">季节特点：</h5>
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                {getCurrentSeasonCharacteristics(selectedDate)}
+              </p>
+            </div>
+            
+            <div>
+              <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">养生建议：</h5>
+              <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed space-y-1">
+                {getCurrentSeasonAdvice(selectedDate).split('\n').map((line, index) => (
+                  <div key={index} className="flex items-start">
+                    <span className="text-teal-500 mr-2">•</span>
+                    <span>{line.replace(/^\d+\.\s*/, '')}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 当前时辰器官节律 */}
+          <div className="bg-purple-50 dark:bg-purple-900 dark:bg-opacity-20 border border-purple-200 dark:border-purple-700 rounded-lg p-5 hover:shadow-md transition-shadow">
+            <div className="flex items-center mb-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 mr-4 flex-shrink-0 flex items-center justify-center shadow-md">
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold text-purple-800 dark:text-purple-300">当前时辰养生</h4>
+                <p className="text-sm text-purple-600 dark:text-purple-400">此时段最佳养生方式</p>
+              </div>
+            </div>
+            
+            <div className="ml-14">
+              <div className="mb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">当前时段：</span>
+                  <span className="px-3 py-1 bg-white dark:bg-gray-700 border border-purple-300 dark:border-purple-600 rounded-full text-sm font-medium text-purple-700 dark:text-purple-300">
+                    {getCurrentOrganTime(new Date())}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">当令器官：</span>
+                  <span className="px-3 py-1 bg-white dark:bg-gray-700 border border-purple-300 dark:border-purple-600 rounded-full text-sm font-medium text-purple-700 dark:text-purple-300">
+                    {getCurrentOrgan(new Date())}
+                  </span>
+                </div>
+              </div>
+            
+              <div className="mb-4">
+                <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">节律特点：</h5>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  {getCurrentOrganDescription(new Date())}
+                </p>
+              </div>
+              
+              <div className="mb-4">
+                <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">养生建议：</h5>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  {getCurrentOrganSuggestion(new Date())}
+                </p>
+              </div>
+              
+              <div className="bg-purple-100 dark:bg-purple-900 dark:bg-opacity-30 rounded-lg p-3">
+                <h5 className="text-sm font-medium text-purple-800 dark:text-purple-300 mb-1">健康提示：</h5>
+                <p className="text-xs text-purple-700 dark:text-purple-300">
+                  {getCurrentOrganHealthTip(new Date())}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 养生小贴士 */}
+        <div className="mt-6 p-4 bg-teal-50 dark:bg-teal-900 dark:bg-opacity-20 border border-teal-200 dark:border-teal-700 rounded-lg">
+          <h5 className="font-medium text-teal-800 dark:text-teal-300 mb-2 flex items-center">
+            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+            四季养生小贴士
+          </h5>
+          <ul className="text-sm text-teal-700 dark:text-teal-300 space-y-1">
+            {seasonGeneralTips.map((tip, index) => (
+              <li key={index}>• {tip}</li>
+            ))}
           </ul>
         </div>
       </div>
@@ -625,13 +843,11 @@ const DressInfo = ({ apiBaseUrl, serviceStatus, isDesktop }) => {
           温馨提示
         </h4>
         <div className="text-yellow-100 text-sm leading-relaxed">
-          <p className="mb-2">
-            五行穿衣和饮食建议仅供参考，主要目的是帮助您在日常生活中保持身心和谐。
-            请根据个人实际情况、身体状况和喜好进行适当调整。
-          </p>
-          <p>
-            最重要的是保持积极乐观的心态，合理搭配衣着，均衡营养饮食，这样才能真正达到养生保健的效果。
-          </p>
+          {warmReminders.map((reminder, index) => (
+            <p key={index} className={index > 0 ? '' : 'mb-2'}>
+              {reminder}
+            </p>
+          ))}
         </div>
       </div>
     </div>

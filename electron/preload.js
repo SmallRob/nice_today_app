@@ -40,6 +40,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getRange: (daysBefore, daysAfter) => ipcRenderer.invoke('dress:get-range', daysBefore, daysAfter)
   },
 
+  // 四季五行养生相关API
+  seasonHealth: {
+    getAdvice: (date) => ipcRenderer.invoke('seasonHealth:get-advice', date)
+  },
+
   // 系统相关API
   system: {
     healthCheck: () => ipcRenderer.invoke('system:health-check')

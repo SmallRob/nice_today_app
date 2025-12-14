@@ -332,6 +332,34 @@ export const desktopDressService = {
   }
 };
 
+// 四季五行养生服务
+export const desktopSeasonHealthService = {
+  // 获取四季五行养生建议
+  getAdvice: async (date) => {
+    if (!isDesktopApp()) {
+      return {
+        success: false,
+        error: '请在桌面应用中运行此功能'
+      };
+    }
+
+    try {
+      const dateStr = typeof date === 'string' 
+        ? date 
+        : formatDateString(date);
+      
+      const result = await window.electronAPI.seasonHealth.getAdvice(dateStr);
+      return result;
+    } catch (error) {
+      console.error('获取四季五行养生建议失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+};
+
 // 统一的服务接口 - 自动检测环境并选择合适的方法
 export const unifiedService = {
   // 生物节律服务
@@ -445,6 +473,20 @@ export const unifiedService = {
     getRange: async (daysBefore, daysAfter) => {
       if (isDesktopApp()) {
         return desktopDressService.getRange(daysBefore, daysAfter);
+      } else {
+        return {
+          success: false,
+          error: '此功能仅在桌面应用中可用'
+        };
+      }
+    }
+  },
+
+  // 四季五行养生服务
+  seasonHealth: {
+    getAdvice: async (date) => {
+      if (isDesktopApp()) {
+        return desktopSeasonHealthService.getAdvice(date);
       } else {
         return {
           success: false,

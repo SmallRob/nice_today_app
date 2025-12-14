@@ -286,6 +286,16 @@ ipcMain.handle('dress:get-range', async (event, daysBefore, daysAfter) => {
   }
 })
 
+// IPC通信处理 - 四季五行养生相关
+ipcMain.handle('seasonHealth:get-advice', async (event, date) => {
+  try {
+    return await backendService.getSeasonHealthAdvice(date)
+  } catch (error) {
+    console.error('四季五行养生建议获取失败:', error)
+    throw error
+  }
+})
+
 // 系统状态检查
 ipcMain.handle('system:health-check', async () => {
   try {
@@ -296,7 +306,8 @@ ipcMain.handle('system:health-check', async () => {
       services: {
         biorhythm: backendService.isBiorhythmServiceReady(),
         maya: backendService.isMayaServiceReady(),
-        dress: backendService.isDressServiceReady()
+        dress: backendService.isDressServiceReady(),
+        seasonHealth: backendService.isSeasonHealthServiceReady()
       }
     }
   } catch (error) {

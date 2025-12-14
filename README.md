@@ -10,7 +10,7 @@ Nice Today 是一个现代化的生物节律应用，通过分析用户的生物
 
 ![Nice Today](./images/Snipaste_2025-12-14_12-37-49.png)
 ![Nice Today](./images/Snipaste_2025-12-14_12-38-18.png)
-![Nice Today](./images/Snipaste_2025-12-14_12-38-35.png)
+![Nice Today](./images/Snipaste_2025-12-14_17-31-10.png)
 
 ## 🏗️ 技术栈
 

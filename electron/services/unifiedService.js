@@ -1,6 +1,7 @@
 const { biorhythmService } = require('./biorhythmService');
 const { mayaService } = require('./mayaService');
 const { dressService } = require('./dressService');
+const { seasonHealthService } = require('./seasonHealthService');
 
 /**
  * 统一服务
@@ -11,6 +12,7 @@ class UnifiedService {
         this.biorhythmService = biorhythmService;
         this.mayaService = mayaService;
         this.dressService = dressService;
+        this.seasonHealthService = seasonHealthService;
     }
 
     // ==================== 生物节律相关接口 ====================
@@ -129,6 +131,17 @@ class UnifiedService {
      */
     getDressInfoRange(daysBefore, daysAfter) {
         return this.dressService.getDressInfoRange(daysBefore, daysAfter);
+    }
+
+    // ==================== 四季五行养生相关接口 ====================
+    
+    /**
+     * 获取综合的四季五行养生建议
+     * @param {Date|string} date - 日期
+     * @returns {Object} 养生建议数据
+     */
+    getSeasonHealthAdvice(date) {
+        return this.seasonHealthService.getSeasonHealthAdvice(date);
     }
 
     // ==================== 系统接口 ====================
