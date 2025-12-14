@@ -199,7 +199,13 @@ const BiorhythmInfo = ({ data, title, birthDate }) => {
     const loadOrganData = async () => {
       try {
         setOrganLoading(true);
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmInfo.js:200',message:'Loading organ rhythm data',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'csv-fix2',hypothesisId:'H'})}).catch(()=>{});
+        // #endregion
         const result = await fetchOrganRhythmData();
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmInfo.js:203',message:'Organ rhythm data result',data:{success:result.success,hasData:!!result.data,dataLength:result.data?.length||0,hasError:!!result.error,hasFallback:!!result.fallbackData},timestamp:Date.now(),sessionId:'debug-session',runId:'csv-fix2',hypothesisId:'H'})}).catch(()=>{});
+        // #endregion
         
         if (result.success) {
           setOrganData(result.data);
@@ -210,6 +216,9 @@ const BiorhythmInfo = ({ data, title, birthDate }) => {
         }
       } catch (error) {
         console.error('加载器官节律数据时出错:', error);
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmInfo.js:212',message:'Organ rhythm data error',data:{error:error.message},timestamp:Date.now(),sessionId:'debug-session',runId:'csv-fix2',hypothesisId:'H'})}).catch(()=>{});
+        // #endregion
         setOrganError('无法加载器官节律数据');
       } finally {
         setOrganLoading(false);

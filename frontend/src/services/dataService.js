@@ -32,13 +32,47 @@ export const parseCSV = (csvText) => {
 // 获取器官节律数据
 export const fetchOrganRhythmData = async () => {
   try {
-    // 尝试从CSV文件获取数据
-    const response = await fetch('/data/organRhythmData.csv');
-    if (!response.ok) {
-      throw new Error('无法加载器官节律数据');
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/services/dataService.js:33',message:'fetchOrganRhythmData called',data:{isElectron:typeof window.electronAPI!=='undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'csv-fix',hypothesisId:'H'})}).catch(()=>{});
+    // #endregion
+    
+    // 在Electron环境中，尝试多个可能的路径
+    const possiblePaths = [
+      './data/organRhythmData.csv',  // 相对路径
+      '/data/organRhythmData.csv',   // 绝对路径
+      'data/organRhythmData.csv'     // 无前导斜杠
+    ];
+    
+    let response = null;
+    let csvText = null;
+    let lastError = null;
+    
+    for (const path of possiblePaths) {
+      try {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/services/dataService.js:45',message:'Trying CSV path',data:{path},timestamp:Date.now(),sessionId:'debug-session',runId:'csv-fix',hypothesisId:'H'})}).catch(()=>{});
+        // #endregion
+        
+        response = await fetch(path);
+        if (response.ok) {
+          csvText = await response.text();
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/services/dataService.js:50',message:'CSV loaded successfully',data:{path,csvLength:csvText.length},timestamp:Date.now(),sessionId:'debug-session',runId:'csv-fix',hypothesisId:'H'})}).catch(()=>{});
+          // #endregion
+          break;
+        }
+      } catch (err) {
+        lastError = err;
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/services/dataService.js:57',message:'CSV path failed',data:{path,error:err.message},timestamp:Date.now(),sessionId:'debug-session',runId:'csv-fix',hypothesisId:'H'})}).catch(()=>{});
+        // #endregion
+      }
     }
     
-    const csvText = await response.text();
+    if (!csvText) {
+      throw new Error(`无法加载器官节律数据: ${lastError?.message || '所有路径都失败'}`);
+    }
+    
     const data = parseCSV(csvText);
     
     // 确保数据格式正确
@@ -58,6 +92,9 @@ export const fetchOrganRhythmData = async () => {
     };
   } catch (error) {
     console.error('获取器官节律数据失败:', error);
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/services/dataService.js:75',message:'CSV load failed, using fallback',data:{error:error.message},timestamp:Date.now(),sessionId:'debug-session',runId:'csv-fix',hypothesisId:'H'})}).catch(()=>{});
+    // #endregion
     
     // 提供默认数据作为备选
     return {

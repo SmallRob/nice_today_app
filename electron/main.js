@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, Menu } = require('electron')
 const path = require('path')
+const fs = require('fs')
 const isDev = process.env.NODE_ENV === 'development'
 
 // 使用新的JavaScript后端服务模块
@@ -9,6 +10,16 @@ let mainWindow
 let backendService
 
 function createWindow() {
+  // 立即初始化后端服务，确保在窗口创建时服务已就绪
+  if (!backendService) {
+    backendService = new JavaScriptBackendService()
+    console.log('后端服务已初始化（在窗口创建时）')
+    // #region agent log
+    const logPath = path.join(__dirname, '../../.cursor/debug.log');
+    try{fs.appendFileSync(logPath,JSON.stringify({location:'electron/main.js:13',message:'Backend service initialized at window creation',data:{hasService:!!backendService},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})+'\n');}catch(e){}
+    // #endregion
+  }
+
   // 创建浏览器窗口
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -34,18 +45,17 @@ function createWindow() {
   } else {
     // 在生产环境中，加载打包后的前端文件
     const appPath = process.resourcesPath ? path.join(process.resourcesPath, 'app') : path.join(__dirname, '../frontend/build');
-    mainWindow.loadFile(path.join(appPath, 'index.html'))
+    const htmlPath = path.join(appPath, 'index.html')
+    // #region agent log
+    const logPath = path.join(__dirname, '../../.cursor/debug.log');
+    try{fs.appendFileSync(logPath,JSON.stringify({location:'electron/main.js:37',message:'Loading HTML file',data:{appPath,htmlPath,exists:fs.existsSync(htmlPath)},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})+'\n');}catch(e){}
+    // #endregion
+    mainWindow.loadFile(htmlPath)
   }
 
   // 窗口准备就绪后显示
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
-    
-    // 立即初始化后端服务确保页面加载时服务已就绪
-    if (!backendService) {
-        backendService = new JavaScriptBackendService()
-        console.log('后端服务已初始化')
-    }
   })
 
   // 窗口关闭时的处理

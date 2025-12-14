@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { fetchDressInfoRange, fetchSpecificDateDressInfo, formatDateString } from '../services/apiService';
+import { desktopDressService, isDesktopApp } from '../services/desktopService';
 
-const DressInfo = ({ apiBaseUrl }) => {
+const DressInfo = ({ apiBaseUrl, serviceStatus, isDesktop }) => {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/DressInfo.js:6',message:'DressInfo mounted',data:{hasApiBaseUrl:!!apiBaseUrl,hasServiceStatus:serviceStatus!==undefined,serviceStatus,hasIsDesktop:isDesktop!==undefined,isDesktop,hasElectronAPI:typeof window.electronAPI!=='undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'dress-fix',hypothesisId:'J'})}).catch(()=>{});
+  // #endregion
   const [dressInfoList, setDressInfoList] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDressInfo, setSelectedDressInfo] = useState(null);
@@ -14,12 +18,24 @@ const DressInfo = ({ apiBaseUrl }) => {
   useEffect(() => {
     // 等待服务就绪后再加载数据
     const waitForService = async () => {
-      // 等待最多2秒让服务就绪
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/DressInfo.js:14',message:'DressInfo waitForService started',data:{isDesktop,serviceStatus,hasElectronAPI:typeof window.electronAPI!=='undefined',apiReady:window.electronAPI?.isReady?.()||false,apiBaseUrl:!!apiBaseUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'dress-fix',hypothesisId:'J'})}).catch(()=>{});
+      // #endregion
+      
+      // 等待最多5秒让服务就绪
       let attempts = 0;
-      const maxAttempts = 20; // 2秒 (20 * 100ms)
+      const maxAttempts = 50; // 5秒 (50 * 100ms)
       
       while (attempts < maxAttempts) {
-        if (apiBaseUrl) {
+        // 在Electron环境中，只要electronAPI存在且就绪就尝试使用
+        const canUseService = isDesktop && isDesktopApp()
+          ? (window.electronAPI && window.electronAPI.isReady && window.electronAPI.isReady())
+          : (apiBaseUrl);
+        
+        if (canUseService) {
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/DressInfo.js:24',message:'DressInfo service ready, loading data',data:{attempts},timestamp:Date.now(),sessionId:'debug-session',runId:'dress-fix',hypothesisId:'J'})}).catch(()=>{});
+          // #endregion
           loadDressInfoRange();
           return;
         }
@@ -29,27 +45,102 @@ const DressInfo = ({ apiBaseUrl }) => {
         attempts++;
       }
       
-      // 如果超过最大尝试次数仍未就绪，仍然尝试加载
-      console.warn('服务未及时就绪，但仍尝试加载穿搭建议数据');
-      if (apiBaseUrl) {
+      // 如果超过最大尝试次数仍未就绪，仍然尝试加载（Electron环境）
+      if (isDesktop && isDesktopApp() && window.electronAPI) {
+        console.warn('服务未及时就绪，但仍尝试加载穿搭建议数据');
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/DressInfo.js:37',message:'DressInfo max attempts reached, trying anyway',data:{attempts},timestamp:Date.now(),sessionId:'debug-session',runId:'dress-fix',hypothesisId:'J'})}).catch(()=>{});
+        // #endregion
         loadDressInfoRange();
       }
     };
     
     waitForService();
-  }, [apiBaseUrl]);
+  }, [isDesktop, serviceStatus, apiBaseUrl]);
 
   
   // 加载穿搭建议范围数据
   const loadDressInfoRange = async () => {
-    if (!apiBaseUrl) {
-      setError("API基础URL未设置，无法获取穿搭建议信息");
-      setLoading(false);
-      return;
-    }
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/DressInfo.js:44',message:'loadDressInfoRange called',data:{isDesktop,serviceStatus,apiBaseUrl:!!apiBaseUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'dress-fix',hypothesisId:'J'})}).catch(()=>{});
+    // #endregion
     
     setLoading(true);
-    const result = await fetchDressInfoRange(apiBaseUrl);
+    let result;
+    
+    if (isDesktop && isDesktopApp()) {
+      // 使用桌面服务
+      try {
+        result = await desktopDressService.getRange(1, 6);
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/DressInfo.js:52',message:'DressInfo desktop service result',data:{success:result.success,hasData:!!result.data,dataKeys:result.data?Object.keys(result.data):[]},timestamp:Date.now(),sessionId:'debug-session',runId:'dress-fix',hypothesisId:'J'})}).catch(()=>{});
+        // #endregion
+        
+        if (result.success && result.data) {
+          // desktopService返回的是{success: true, data: {dress_info_list: [...], date_range: {...}}}
+          const dressData = result.data;
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/DressInfo.js:81',message:'DressInfo data structure',data:{hasDressData:!!dressData,dataKeys:Object.keys(dressData),hasDressInfoList:!!dressData.dress_info_list,hasDateRange:!!dressData.date_range},timestamp:Date.now(),sessionId:'debug-session',runId:'dress-fix2',hypothesisId:'J'})}).catch(()=>{});
+          // #endregion
+          
+          // 检查数据格式
+          let dressInfoList = [];
+          let dateRange = { start: new Date(), end: new Date() };
+          
+          if (dressData.dress_info_list) {
+            // 直接有dress_info_list
+            dressInfoList = dressData.dress_info_list;
+          } else if (dressData.data && dressData.data.dress_info_list) {
+            // 嵌套在data中
+            dressInfoList = dressData.data.dress_info_list;
+          } else if (Array.isArray(dressData)) {
+            // 直接是数组
+            dressInfoList = dressData;
+          }
+          
+          if (dressData.date_range) {
+            // date_range.start和end是字符串格式（YYYY-MM-DD），需要正确解析
+            const startStr = dressData.date_range.start;
+            const endStr = dressData.date_range.end;
+            dateRange = {
+              start: startStr ? (typeof startStr === 'string' ? new Date(startStr + 'T00:00:00') : new Date(startStr)) : new Date(),
+              end: endStr ? (typeof endStr === 'string' ? new Date(endStr + 'T00:00:00') : new Date(endStr)) : new Date()
+            };
+          } else if (dressData.data && dressData.data.date_range) {
+            const startStr = dressData.data.date_range.start;
+            const endStr = dressData.data.date_range.end;
+            dateRange = {
+              start: startStr ? (typeof startStr === 'string' ? new Date(startStr + 'T00:00:00') : new Date(startStr)) : new Date(),
+              end: endStr ? (typeof endStr === 'string' ? new Date(endStr + 'T00:00:00') : new Date(endStr)) : new Date()
+            };
+          }
+          
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/DressInfo.js:102',message:'DressInfo data extracted',data:{dressInfoListLength:dressInfoList.length,hasDateRange:!!dateRange.start},timestamp:Date.now(),sessionId:'debug-session',runId:'dress-fix2',hypothesisId:'J'})}).catch(()=>{});
+          // #endregion
+          
+          result = {
+            success: true,
+            dressInfoList: dressInfoList,
+            dateRange: dateRange
+          };
+        }
+      } catch (error) {
+        console.error('加载穿搭建议数据失败:', error);
+        result = {
+          success: false,
+          error: error.message
+        };
+      }
+    } else {
+      // 使用Web API
+      if (!apiBaseUrl) {
+        setError("API基础URL未设置，无法获取穿搭建议信息");
+        setLoading(false);
+        return;
+      }
+      result = await fetchDressInfoRange(apiBaseUrl);
+    }
     
     if (result.success) {
       console.log(`API返回的穿搭建议数据: ${result.dressInfoList.length}天`);

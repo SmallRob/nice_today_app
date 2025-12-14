@@ -174,6 +174,9 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
               <BiorhythmTab 
                 serviceStatus={serviceStatus.biorhythm}
                 isDesktop={appInfo.isDesktop}
+                // #region agent log
+                // Logging props passed to BiorhythmTab
+                // #endregion
               />
             )}
             

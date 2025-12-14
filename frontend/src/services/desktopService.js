@@ -66,10 +66,9 @@ export const desktopBiorhythmService = {
         : formatDateString(birthDate);
       
       const result = await window.electronAPI.biorhythm.getToday(birthDateStr);
-      return {
-        success: true,
-        data: result
-      };
+      // IPC返回的是{success: true, data: actualData}，直接返回result
+      // 因为result已经是正确的格式
+      return result;
     } catch (error) {
       console.error('获取今日生物节律失败:', error);
       return {
@@ -97,10 +96,8 @@ export const desktopBiorhythmService = {
         : formatDateString(targetDate);
       
       const result = await window.electronAPI.biorhythm.getDate(birthDateStr, targetDateStr);
-      return {
-        success: true,
-        data: result
-      };
+      // IPC返回的是{success: true, data: actualData}，直接返回result
+      return result;
     } catch (error) {
       console.error('获取指定日期生物节律失败:', error);
       return {
@@ -125,10 +122,8 @@ export const desktopBiorhythmService = {
         : formatDateString(birthDate);
       
       const result = await window.electronAPI.biorhythm.getRange(birthDateStr, daysBefore, daysAfter);
-      return {
-        success: true,
-        data: result
-      };
+      // IPC返回的是{success: true, data: actualData}，直接返回result
+      return result;
     } catch (error) {
       console.error('获取生物节律范围失败:', error);
       return {
@@ -152,10 +147,8 @@ export const desktopMayaService = {
 
     try {
       const result = await window.electronAPI.maya.getToday();
-      return {
-        success: true,
-        data: result
-      };
+      // IPC返回的是{success: true, data: actualData}，直接返回result
+      return result;
     } catch (error) {
       console.error('获取今日玛雅历法信息失败:', error);
       return {
@@ -180,10 +173,8 @@ export const desktopMayaService = {
         : formatDateString(targetDate);
       
       const result = await window.electronAPI.maya.getDate(targetDateStr);
-      return {
-        success: true,
-        data: result
-      };
+      // IPC返回的是{success: true, data: actualData}，直接返回result
+      return result;
     } catch (error) {
       console.error('获取指定日期玛雅历法信息失败:', error);
       return {
@@ -204,10 +195,9 @@ export const desktopMayaService = {
 
     try {
       const result = await window.electronAPI.maya.getRange(daysBefore, daysAfter);
-      return {
-        success: true,
-        data: result
-      };
+      // IPC返回的是{success: true, data: {maya_info_list: [...], date_range: {...}}}
+      // 直接返回result，因为result已经是正确的格式
+      return result;
     } catch (error) {
       console.error('获取玛雅历法范围信息失败:', error);
       return {
@@ -259,10 +249,8 @@ export const desktopDressService = {
 
     try {
       const result = await window.electronAPI.dress.getToday();
-      return {
-        success: true,
-        data: result
-      };
+      // IPC返回的是{success: true, data: actualData}，直接返回result
+      return result;
     } catch (error) {
       console.error('获取今日穿搭建议失败:', error);
       return {
@@ -287,10 +275,8 @@ export const desktopDressService = {
         : formatDateString(targetDate);
       
       const result = await window.electronAPI.dress.getDate(targetDateStr);
-      return {
-        success: true,
-        data: result
-      };
+      // IPC返回的是{success: true, data: actualData}，直接返回result
+      return result;
     } catch (error) {
       console.error('获取指定日期穿搭建议失败:', error);
       return {
@@ -311,10 +297,9 @@ export const desktopDressService = {
 
     try {
       const result = await window.electronAPI.dress.getRange(daysBefore, daysAfter);
-      return {
-        success: true,
-        data: result
-      };
+      // IPC返回的是{success: true, data: {dress_info_list: [...], date_range: {...}}}
+      // 直接返回result，因为result已经是正确的格式
+      return result;
     } catch (error) {
       console.error('获取穿搭建议范围信息失败:', error);
       return {

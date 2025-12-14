@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { fetchMayaCalendarRange, fetchSpecificDateMayaInfo, formatDateString } from '../services/apiService';
+import { desktopMayaService, isDesktopApp } from '../services/desktopService';
 
 
 // 玛雅日历工具类 - 集中管理所有辅助功能
@@ -400,7 +401,10 @@ class MayaCalendarUtils {
 
 }
 
-const MayaCalendar = ({ apiBaseUrl }) => {
+const MayaCalendar = ({ apiBaseUrl, serviceStatus, isDesktop }) => {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/MayaCalendar.js:403',message:'MayaCalendar mounted',data:{hasApiBaseUrl:!!apiBaseUrl,hasServiceStatus:serviceStatus!==undefined,serviceStatus,hasIsDesktop:isDesktop!==undefined,isDesktop,hasElectronAPI:typeof window.electronAPI!=='undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'maya-fix',hypothesisId:'I'})}).catch(()=>{});
+  // #endregion
   const [mayaInfoList, setMayaInfoList] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedMayaInfo, setSelectedMayaInfo] = useState(null);
@@ -413,12 +417,24 @@ const MayaCalendar = ({ apiBaseUrl }) => {
   useEffect(() => {
     // 等待服务就绪后再加载数据
     const waitForService = async () => {
-      // 等待最多2秒让服务就绪
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/MayaCalendar.js:415',message:'MayaCalendar waitForService started',data:{isDesktop,serviceStatus,hasElectronAPI:typeof window.electronAPI!=='undefined',apiReady:window.electronAPI?.isReady?.()||false,apiBaseUrl:!!apiBaseUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'maya-fix',hypothesisId:'I'})}).catch(()=>{});
+      // #endregion
+      
+      // 等待最多5秒让服务就绪
       let attempts = 0;
-      const maxAttempts = 20; // 2秒 (20 * 100ms)
+      const maxAttempts = 50; // 5秒 (50 * 100ms)
       
       while (attempts < maxAttempts) {
-        if (apiBaseUrl) {
+        // 在Electron环境中，只要electronAPI存在且就绪就尝试使用
+        const canUseService = isDesktop && isDesktopApp()
+          ? (window.electronAPI && window.electronAPI.isReady && window.electronAPI.isReady())
+          : (apiBaseUrl);
+        
+        if (canUseService) {
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/MayaCalendar.js:425',message:'MayaCalendar service ready, loading data',data:{attempts},timestamp:Date.now(),sessionId:'debug-session',runId:'maya-fix',hypothesisId:'I'})}).catch(()=>{});
+          // #endregion
           loadMayaCalendarRange();
           return;
         }
@@ -428,27 +444,102 @@ const MayaCalendar = ({ apiBaseUrl }) => {
         attempts++;
       }
       
-      // 如果超过最大尝试次数仍未就绪，仍然尝试加载
-      console.warn('服务未及时就绪，但仍尝试加载玛雅日历数据');
-      if (apiBaseUrl) {
+      // 如果超过最大尝试次数仍未就绪，仍然尝试加载（Electron环境）
+      if (isDesktop && isDesktopApp() && window.electronAPI) {
+        console.warn('服务未及时就绪，但仍尝试加载玛雅日历数据');
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/MayaCalendar.js:438',message:'MayaCalendar max attempts reached, trying anyway',data:{attempts},timestamp:Date.now(),sessionId:'debug-session',runId:'maya-fix',hypothesisId:'I'})}).catch(()=>{});
+        // #endregion
         loadMayaCalendarRange();
       }
     };
     
     waitForService();
-  }, [apiBaseUrl]);
+  }, [isDesktop, serviceStatus, apiBaseUrl]);
   
   
   // 加载玛雅日历范围数据
   const loadMayaCalendarRange = async () => {
-    if (!apiBaseUrl) {
-      setError("API基础URL未设置，无法获取玛雅日历信息");
-      setLoading(false);
-      return;
-    }
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/MayaCalendar.js:443',message:'loadMayaCalendarRange called',data:{isDesktop,serviceStatus,apiBaseUrl:!!apiBaseUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'maya-fix',hypothesisId:'I'})}).catch(()=>{});
+    // #endregion
     
     setLoading(true);
-    const result = await fetchMayaCalendarRange(apiBaseUrl);
+    let result;
+    
+    if (isDesktop && isDesktopApp()) {
+      // 使用桌面服务
+      try {
+        result = await desktopMayaService.getRange(3, 3);
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/MayaCalendar.js:451',message:'MayaCalendar desktop service result',data:{success:result.success,hasData:!!result.data,dataKeys:result.data?Object.keys(result.data):[]},timestamp:Date.now(),sessionId:'debug-session',runId:'maya-fix',hypothesisId:'I'})}).catch(()=>{});
+        // #endregion
+        
+        if (result.success && result.data) {
+          // desktopService返回的是{success: true, data: {maya_info_list: [...], date_range: {...}}}
+          const mayaData = result.data;
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/MayaCalendar.js:480',message:'MayaCalendar data structure',data:{hasMayaData:!!mayaData,dataKeys:Object.keys(mayaData),hasMayaInfoList:!!mayaData.maya_info_list,hasDateRange:!!mayaData.date_range},timestamp:Date.now(),sessionId:'debug-session',runId:'maya-fix2',hypothesisId:'I'})}).catch(()=>{});
+          // #endregion
+          
+          // 检查数据格式
+          let mayaInfoList = [];
+          let dateRange = { start: new Date(), end: new Date() };
+          
+          if (mayaData.maya_info_list) {
+            // 直接有maya_info_list
+            mayaInfoList = mayaData.maya_info_list;
+          } else if (mayaData.data && mayaData.data.maya_info_list) {
+            // 嵌套在data中
+            mayaInfoList = mayaData.data.maya_info_list;
+          } else if (Array.isArray(mayaData)) {
+            // 直接是数组
+            mayaInfoList = mayaData;
+          }
+          
+          if (mayaData.date_range) {
+            // date_range.start和end是字符串格式（YYYY-MM-DD），需要正确解析
+            const startStr = mayaData.date_range.start;
+            const endStr = mayaData.date_range.end;
+            dateRange = {
+              start: startStr ? (typeof startStr === 'string' ? new Date(startStr + 'T00:00:00') : new Date(startStr)) : new Date(),
+              end: endStr ? (typeof endStr === 'string' ? new Date(endStr + 'T00:00:00') : new Date(endStr)) : new Date()
+            };
+          } else if (mayaData.data && mayaData.data.date_range) {
+            const startStr = mayaData.data.date_range.start;
+            const endStr = mayaData.data.date_range.end;
+            dateRange = {
+              start: startStr ? (typeof startStr === 'string' ? new Date(startStr + 'T00:00:00') : new Date(startStr)) : new Date(),
+              end: endStr ? (typeof endStr === 'string' ? new Date(endStr + 'T00:00:00') : new Date(endStr)) : new Date()
+            };
+          }
+          
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/MayaCalendar.js:500',message:'MayaCalendar data extracted',data:{mayaInfoListLength:mayaInfoList.length,hasDateRange:!!dateRange.start},timestamp:Date.now(),sessionId:'debug-session',runId:'maya-fix2',hypothesisId:'I'})}).catch(()=>{});
+          // #endregion
+          
+          result = {
+            success: true,
+            mayaInfoList: mayaInfoList,
+            dateRange: dateRange
+          };
+        }
+      } catch (error) {
+        console.error('加载玛雅日历数据失败:', error);
+        result = {
+          success: false,
+          error: error.message
+        };
+      }
+    } else {
+      // 使用Web API
+      if (!apiBaseUrl) {
+        setError("API基础URL未设置，无法获取玛雅日历信息");
+        setLoading(false);
+        return;
+      }
+      result = await fetchMayaCalendarRange(apiBaseUrl);
+    }
     
     if (result.success) {
       console.log(`API返回的玛雅日历数据: ${result.mayaInfoList.length}天`);

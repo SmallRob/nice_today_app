@@ -5,12 +5,16 @@ import BiorhythmChart from './BiorhythmChart';
 import BiorhythmInfo from './BiorhythmInfo';
 import DailySuggestions from './DailySuggestions';
 import { fetchHistoryDates, fetchBiorhythmData } from '../services/apiService';
+import { desktopBiorhythmService, isDesktopApp } from '../services/desktopService';
 import elementConfig from '../config/elementConfig.json';
 
 // 自定义日期选择器样式
 import "./DatePickerStyles.css";
 
-const BiorhythmTab = ({ apiBaseUrl, apiConnected }) => {
+const BiorhythmTab = ({ apiBaseUrl, apiConnected, serviceStatus, isDesktop }) => {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:13',message:'BiorhythmTab mounted',data:{hasApiBaseUrl:!!apiBaseUrl,hasApiConnected:apiConnected!==undefined,apiConnected,hasServiceStatus:serviceStatus!==undefined,serviceStatus,hasIsDesktop:isDesktop!==undefined,isDesktop,hasElectronAPI:typeof window.electronAPI!=='undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+  // #endregion
   const [birthDate, setBirthDate] = useState(null);
   const [rhythmData, setRhythmData] = useState(null);
   const [todayData, setTodayData] = useState(null);
@@ -37,28 +41,104 @@ const BiorhythmTab = ({ apiBaseUrl, apiConnected }) => {
       return;
     }
 
-    if (!apiConnected) {
-      setError("后端API未连接，无法获取数据");
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:40',message:'loadBiorhythmData called',data:{hasApiBaseUrl:!!apiBaseUrl,apiConnected,hasDateToUse:!!dateToUse,isDesktop,serviceStatus,hasElectronAPI:typeof window.electronAPI!=='undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
+    
+    // 检查服务是否可用
+    // 在Electron环境中，只要electronAPI存在且就绪就尝试使用（不依赖serviceStatus，因为它可能还没更新）
+    const canUseService = isDesktop && isDesktopApp()
+      ? (window.electronAPI && window.electronAPI.isReady && window.electronAPI.isReady())
+      : (apiConnected && apiBaseUrl);
+    
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:49',message:'Service check in loadBiorhythmData',data:{canUseService,isDesktop,serviceStatus,hasElectronAPI:typeof window.electronAPI!=='undefined',apiReady:window.electronAPI?.isReady?.()||false},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix3',hypothesisId:'G'})}).catch(()=>{});
+    // #endregion
+    
+    if (!canUseService) {
+      setError(isDesktop ? "桌面服务未就绪，无法获取数据" : "后端API未连接，无法获取数据");
       return;
     }
 
     setLoading(true);
     setError(null);
 
-    const result = await fetchBiorhythmData(apiBaseUrl, dateToUse);
+    let result;
+    if (isDesktop && isDesktopApp()) {
+      // 使用桌面服务
+      const birthDateStr = typeof dateToUse === 'string' 
+        ? dateToUse 
+        : dateToUse.toISOString().split('T')[0];
+      
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:64',message:'Calling desktop services',data:{birthDateStr},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix2',hypothesisId:'F'})}).catch(()=>{});
+      // #endregion
+      
+      // 获取今日数据
+      const todayResult = await desktopBiorhythmService.getToday(birthDateStr);
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:69',message:'Today result',data:{success:todayResult.success,hasData:!!todayResult.data,dataKeys:todayResult.data?Object.keys(todayResult.data):[]},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix2',hypothesisId:'F'})}).catch(()=>{});
+      // #endregion
+      
+      // 获取范围数据（用于图表）
+      const rangeResult = await desktopBiorhythmService.getRange(birthDateStr, 10, 20);
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:73',message:'Range result',data:{success:rangeResult.success,hasData:!!rangeResult.data},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix2',hypothesisId:'F'})}).catch(()=>{});
+      // #endregion
+      
+      // 获取7天后数据
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + 7);
+      const futureDateStr = futureDate.toISOString().split('T')[0];
+      const futureResult = await desktopBiorhythmService.getDate(birthDateStr, futureDateStr);
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:79',message:'Future result',data:{success:futureResult.success,hasData:!!futureResult.data},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix2',hypothesisId:'F'})}).catch(()=>{});
+      // #endregion
+      
+      if (todayResult.success && rangeResult.success && futureResult.success) {
+        // desktopBiorhythmService现在直接返回IPC结果，格式是{success: true, data: actualData}
+        const todayData = todayResult.data;
+        const rangeData = rangeResult.data;
+        const futureData = futureResult.data;
+        
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:87',message:'Data extracted',data:{hasTodayData:!!todayData,hasRangeData:!!rangeData,hasFutureData:!!futureData,todayDataKeys:todayData?Object.keys(todayData):[],rangeDataType:Array.isArray(rangeData)?'array':typeof rangeData},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix2',hypothesisId:'F'})}).catch(()=>{});
+        // #endregion
+        
+        result = {
+          success: true,
+          rhythmData: rangeData,
+          todayData: todayData,
+          futureData: futureData
+        };
+      } else {
+        result = {
+          success: false,
+          error: todayResult.error || rangeResult.error || futureResult.error || "获取数据失败"
+        };
+      }
+    } else {
+      // 使用Web API
+      result = await fetchBiorhythmData(apiBaseUrl, dateToUse);
+    }
+    
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:75',message:'Data fetch result',data:{success:result.success,hasError:!!result.error,isDesktop},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
     
     if (result.success) {
       setRhythmData(result.rhythmData);
       setTodayData(result.todayData);
       setFutureData(result.futureData);
       
-      // 如果不是使用默认日期，则更新历史记录
-      if (!isDefaultDate || typeof dateToUse !== 'string' || dateToUse !== DEFAULT_BIRTH_DATE) {
-        setIsDefaultDate(false);
-        // 更新历史记录
-        const historyResult = await fetchHistoryDates(apiBaseUrl);
-        if (historyResult.success) {
-          setHistoryDates(historyResult.history);
+      // 如果不是使用默认日期，则更新历史记录（仅Web环境）
+      if (!isDesktop && !isDefaultDate && apiBaseUrl) {
+        if (typeof dateToUse !== 'string' || dateToUse !== DEFAULT_BIRTH_DATE) {
+          setIsDefaultDate(false);
+          const historyResult = await fetchHistoryDates(apiBaseUrl);
+          if (historyResult.success) {
+            setHistoryDates(historyResult.history);
+          }
         }
       }
       
@@ -72,28 +152,46 @@ const BiorhythmTab = ({ apiBaseUrl, apiConnected }) => {
     
     setLoading(false);
     setShowHistory(false); // 隐藏历史记录下拉菜单
-  }, [apiBaseUrl, apiConnected, birthDate, isDefaultDate, DEFAULT_BIRTH_DATE]);
+  }, [apiBaseUrl, apiConnected, birthDate, isDefaultDate, DEFAULT_BIRTH_DATE, isDesktop, serviceStatus]);
 
   // 更新 ref 以保存最新的 loadBiorhythmData 函数
   useEffect(() => {
+    loadBiorhythmDataRef.current = loadBiorhythmData;
+  }, [loadBiorhythmData]);
+
+  // 组件挂载时自动加载默认数据
+  useEffect(() => {
     // 等待服务就绪后再加载数据
     const waitForService = async () => {
-      // 等待最多2秒让服务就绪
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:160',message:'waitForService started',data:{isDesktop,serviceStatus,hasElectronAPI:typeof window.electronAPI!=='undefined',apiReady:window.electronAPI?.isReady?.()||false,apiBaseUrl:!!apiBaseUrl,apiConnected},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix3',hypothesisId:'G'})}).catch(()=>{});
+      // #endregion
+      
+      // 等待最多5秒让服务就绪
       let attempts = 0;
-      const maxAttempts = 20; // 2秒 (20 * 100ms)
+      const maxAttempts = 50; // 5秒 (50 * 100ms)
       
       while (attempts < maxAttempts) {
-        if (loadBiorhythmDataRef.current && apiBaseUrl && apiConnected) {
+        // 在Electron环境中，只要electronAPI存在且就绪，就尝试加载（不依赖serviceStatus，因为它可能还没更新）
+        const canUseService = isDesktop && isDesktopApp()
+          ? (window.electronAPI && window.electronAPI.isReady && window.electronAPI.isReady())
+          : (apiBaseUrl && apiConnected);
+        
+        // #region agent log
+        if (attempts % 10 === 0) { // 每1秒记录一次
+          fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:170',message:'waitForService check',data:{attempts,canUseService,hasLoadBiorhythmDataRef:!!loadBiorhythmDataRef.current},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix3',hypothesisId:'G'})}).catch(()=>{});
+        }
+        // #endregion
+        
+        if (canUseService && loadBiorhythmDataRef.current) {
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:175',message:'Service ready, loading data',data:{attempts},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix3',hypothesisId:'G'})}).catch(()=>{});
+          // #endregion
           // 使用 setTimeout 确保在下一个事件循环中执行，避免初始化时的循环调用
           const timer = setTimeout(() => {
-            loadHistoryAndData();
+            loadDefaultData();
           }, 0);
           return () => clearTimeout(timer);
-        } else if (!apiConnected) {
-          // 如果API未连接，使用默认日期但不发送请求
-          setIsDefaultDate(true);
-          setBirthDate(new Date(DEFAULT_BIRTH_DATE));
-          return;
         }
         
         // 等待100ms后重试
@@ -101,51 +199,59 @@ const BiorhythmTab = ({ apiBaseUrl, apiConnected }) => {
         attempts++;
       }
       
-      // 如果超过最大尝试次数仍未就绪，仍然尝试加载
-      console.warn('服务未及时就绪，但仍尝试加载数据');
-      if (loadBiorhythmDataRef.current) {
-        const timer = setTimeout(() => {
-          loadHistoryAndData();
-        }, 0);
-        return () => clearTimeout(timer);
+      // 如果超过最大尝试次数仍未就绪，仍然尝试加载（Electron环境）
+      if (isDesktop && isDesktopApp() && window.electronAPI) {
+        console.warn('服务未及时就绪，但仍尝试加载数据');
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:190',message:'Max attempts reached, trying anyway',data:{attempts},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix3',hypothesisId:'G'})}).catch(()=>{});
+        // #endregion
+        if (loadBiorhythmDataRef.current) {
+          const timer = setTimeout(() => {
+            loadDefaultData();
+          }, 0);
+          return () => clearTimeout(timer);
+        }
       }
     };
     
     waitForService();
-  }, [apiBaseUrl, apiConnected, DEFAULT_BIRTH_DATE]);
+  }, [isDesktop, serviceStatus, apiBaseUrl, apiConnected, DEFAULT_BIRTH_DATE]);
 
   
-  // 加载历史记录和数据
-  const loadHistoryAndData = async () => {
-    if (!apiBaseUrl || !apiConnected) return;
-    
+  // 加载默认数据
+  const loadDefaultData = async () => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:200',message:'loadDefaultData called',data:{hasBirthDate:!!birthDate,isDesktop,serviceStatus},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix3',hypothesisId:'G'})}).catch(()=>{});
+    // #endregion
     try {
-      // 获取历史记录
-      const historyResult = await fetchHistoryDates(apiBaseUrl);
-      if (historyResult.success) {
-        setHistoryDates(historyResult.history);
-      }
-      
-      // 加载默认数据
-      if (birthDate) {
-        await loadBiorhythmData(birthDate);
-      } else {
-        // 使用默认日期
+      // 如果已有出生日期，使用它；否则使用默认日期
+      if (!birthDate) {
         const defaultDate = new Date(DEFAULT_BIRTH_DATE);
         setBirthDate(defaultDate);
         setIsDefaultDate(true);
         await loadBiorhythmData(defaultDate);
+      } else {
+        await loadBiorhythmData(birthDate);
       }
     } catch (error) {
-      console.error('加载历史记录和数据失败:', error);
+      console.error('加载默认数据失败:', error);
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:212',message:'loadDefaultData error',data:{error:error.message,stack:error.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix3',hypothesisId:'G'})}).catch(()=>{});
+      // #endregion
+      setError('加载数据失败: ' + error.message);
     }
   };
 
   // 处理日期选择变化
   const handleDateChange = (date) => {
     setBirthDate(date);
+    setIsDefaultDate(false);
     // 当用户选择日期后立即查询
-    if (date && apiConnected) {
+    const canUseService = isDesktop 
+      ? (serviceStatus && isDesktopApp()) 
+      : (apiConnected && apiBaseUrl);
+    
+    if (date && canUseService) {
       loadBiorhythmData(date);
     }
   };
@@ -201,8 +307,8 @@ const BiorhythmTab = ({ apiBaseUrl, apiConnected }) => {
           <div className="flex gap-2">
             <button
               onClick={() => loadBiorhythmData()}
-              disabled={loading || !birthDate || !apiConnected}
-              className={`px-4 py-2 rounded-md text-white ${loading || !birthDate || !apiConnected ? 'bg-gray-400 dark:bg-gray-600' : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'}`}
+              disabled={loading || !birthDate || (isDesktop ? !serviceStatus : !apiConnected)}
+              className={`px-4 py-2 rounded-md text-white ${loading || !birthDate || (isDesktop ? !serviceStatus : !apiConnected) ? 'bg-gray-400 dark:bg-gray-600' : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'}`}
             >
               {loading ? '加载中...' : '分析节律'}
             </button>
