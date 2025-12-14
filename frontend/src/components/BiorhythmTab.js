@@ -15,7 +15,30 @@ const BiorhythmTab = ({ apiBaseUrl, apiConnected, serviceStatus, isDesktop }) =>
   // #region agent log
   fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:13',message:'BiorhythmTab mounted',data:{hasApiBaseUrl:!!apiBaseUrl,hasApiConnected:apiConnected!==undefined,apiConnected,hasServiceStatus:serviceStatus!==undefined,serviceStatus,hasIsDesktop:isDesktop!==undefined,isDesktop,hasElectronAPI:typeof window.electronAPI!=='undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
   // #endregion
-  const [birthDate, setBirthDate] = useState(null);
+  
+  // 从localStorage获取上次使用的出生日期
+  const getStoredBirthDate = () => {
+    try {
+      const stored = localStorage.getItem('last_biorhythm_birthdate');
+      return stored ? new Date(stored) : null;
+    } catch (error) {
+      console.error('获取存储的出生日期失败:', error);
+      return null;
+    }
+  };
+  
+  // 保存出生日期到localStorage
+  const saveBirthDate = (date) => {
+    try {
+      if (date) {
+        localStorage.setItem('last_biorhythm_birthdate', formatDateLocal(date));
+      }
+    } catch (error) {
+      console.error('保存出生日期失败:', error);
+    }
+  };
+  
+  const [birthDate, setBirthDate] = useState(getStoredBirthDate());
   const [rhythmData, setRhythmData] = useState(null);
   const [todayData, setTodayData] = useState(null);
   const [futureData, setFutureData] = useState(null);
@@ -197,7 +220,12 @@ const parseDateLocal = (dateStr) => {
       
       // 如果是字符串日期，转换为Date对象并更新birthDate
       if (typeof dateToUse === 'string') {
-        setBirthDate(parseDateLocal(dateToUse));
+        const dateObj = parseDateLocal(dateToUse);
+        setBirthDate(dateObj);
+        // 保存到localStorage，但仅当不是默认日期时
+        if (!isDefaultDate) {
+          saveBirthDate(dateObj);
+        }
       }
     } else {
       setError(result.error);
@@ -219,6 +247,11 @@ const parseDateLocal = (dateStr) => {
       // #region agent log
       fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:160',message:'waitForService started',data:{isDesktop,serviceStatus,hasElectronAPI:typeof window.electronAPI!=='undefined',apiReady:window.electronAPI?.isReady?.()||false,apiBaseUrl:!!apiBaseUrl,apiConnected},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix3',hypothesisId:'G'})}).catch(()=>{});
       // #endregion
+      
+      // 先尝试加载历史记录，以便获取最近一次查询的出生日期
+      if (isDesktop || apiBaseUrl) {
+        await loadHistoryDates();
+      }
       
       // 等待最多5秒让服务就绪
       let attempts = 0;
@@ -268,24 +301,56 @@ const parseDateLocal = (dateStr) => {
     };
     
     waitForService();
-  }, [isDesktop, serviceStatus, apiBaseUrl, apiConnected, DEFAULT_BIRTH_DATE]);
+  }, [isDesktop, serviceStatus, apiBaseUrl, apiConnected, DEFAULT_BIRTH_DATE, loadHistoryDates]);
 
   
   // 加载默认数据
   const loadDefaultData = async () => {
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:200',message:'loadDefaultData called',data:{hasBirthDate:!!birthDate,isDesktop,serviceStatus},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix3',hypothesisId:'G'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/components/BiorhythmTab.js:200',message:'loadDefaultData called',data:{hasBirthDate:!!birthDate,isDesktop,serviceStatus,historyDatesLength:historyDates.length},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix3',hypothesisId:'G'})}).catch(()=>{});
     // #endregion
     try {
-      // 如果已有出生日期，使用它；否则使用默认日期
-      if (!birthDate) {
-        const defaultDate = new Date(DEFAULT_BIRTH_DATE);
-        setBirthDate(defaultDate);
-        setIsDefaultDate(true);
-        await loadBiorhythmData(defaultDate);
-      } else {
-        await loadBiorhythmData(birthDate);
+      // 优先使用历史记录中最近的日期，其次是当前组件中的日期，然后是localStorage中的日期，再然后是后端默认日期，最后才是配置文件默认日期
+      let dateToUse = birthDate;
+      let shouldMarkAsDefault = false;
+      
+      // 如果没有当前日期，但历史记录中有数据，使用历史记录中最新的日期
+      if (!dateToUse && historyDates.length > 0) {
+        dateToUse = parseDateLocal(historyDates[0]);
+        shouldMarkAsDefault = false; // 这是用户的真实选择，不是默认值
       }
+      
+      // 如果仍然没有日期，尝试从localStorage获取
+      if (!dateToUse) {
+        dateToUse = getStoredBirthDate();
+        if (dateToUse) {
+          shouldMarkAsDefault = false; // 这是用户之前选择的日期，不是默认值
+        }
+      }
+      
+      // 如果仍然没有日期，尝试从后端获取默认日期
+      if (!dateToUse && isDesktop && isDesktopApp()) {
+        try {
+          const result = await desktopBiorhythmService.getDefaultBirthdate();
+          if (result.success && result.data) {
+            dateToUse = parseDateLocal(result.data);
+            shouldMarkAsDefault = false; // 这是用户历史记录中的日期，不是默认值
+            console.log('从后端获取到默认出生日期:', result.data);
+          }
+        } catch (error) {
+          console.warn('从后端获取默认出生日期失败:', error);
+        }
+      }
+      
+      // 如果仍然没有日期，使用默认日期
+      if (!dateToUse) {
+        dateToUse = new Date(DEFAULT_BIRTH_DATE);
+        shouldMarkAsDefault = true;
+      }
+      
+      setBirthDate(dateToUse);
+      setIsDefaultDate(shouldMarkAsDefault);
+      await loadBiorhythmData(dateToUse);
     } catch (error) {
       console.error('加载默认数据失败:', error);
       // #region agent log
@@ -299,6 +364,9 @@ const parseDateLocal = (dateStr) => {
   const handleDateChange = (date) => {
     setBirthDate(date);
     setIsDefaultDate(false);
+    // 保存用户选择的日期到localStorage
+    saveBirthDate(date);
+    
     // 当用户选择日期后立即查询
     const canUseService = isDesktop 
       ? (serviceStatus && isDesktopApp()) 

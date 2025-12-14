@@ -22,6 +22,7 @@ class BiorhythmService {
         try {
             const historyItems = userConfigManager.getBiorhythmHistory();
             this.historyDates = [...historyItems];
+            console.log('加载历史记录成功:', this.historyDates.length, '个历史记录');
         } catch (error) {
             console.error('加载历史记录失败:', error);
             this.historyDates = [];
@@ -33,11 +34,19 @@ class BiorhythmService {
      * @returns {string} 默认出生日期
      */
     getDefaultBirthDate() {
+        // 确保历史记录已加载
+        if (!this.historyDates || this.historyDates.length === 0) {
+            this.loadHistoryFromConfig();
+        }
+        
         // 如果有历史记录，返回最新的历史记录日期
         if (this.historyDates && this.historyDates.length > 0) {
+            console.log('使用历史记录中的最新日期:', this.historyDates[0]);
             return this.historyDates[0];
         }
+        
         // 否则返回默认日期
+        console.log('没有历史记录，使用默认日期: 1991-01-01');
         return "1991-01-01";
     }
 

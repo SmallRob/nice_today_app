@@ -191,6 +191,18 @@ ipcMain.handle('biorhythm:get-history', async () => {
   }
 })
 
+ipcMain.handle('biorhythm:get-default-birthdate', async () => {
+  try {
+    const { unifiedService } = require('./services/unifiedService')
+    const { biorhythmService } = require('./services/biorhythmService')
+    const defaultBirthDate = biorhythmService.getDefaultBirthDate()
+    return { success: true, data: defaultBirthDate }
+  } catch (error) {
+    console.error('获取默认出生日期失败:', error)
+    throw error
+  }
+})
+
 ipcMain.handle('biorhythm:clear-history', async () => {
   try {
     return await backendService.clearBiorhythmHistory()

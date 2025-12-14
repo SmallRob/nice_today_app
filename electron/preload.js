@@ -21,7 +21,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getRange: (birthDate, daysBefore, daysAfter) => ipcRenderer.invoke('biorhythm:get-range', birthDate, daysBefore, daysAfter),
     getHistory: () => ipcRenderer.invoke('biorhythm:get-history'),
     clearHistory: () => ipcRenderer.invoke('biorhythm:clear-history'),
-    removeHistory: (birthDate) => ipcRenderer.invoke('biorhythm:remove-history', birthDate)
+    removeHistory: (birthDate) => ipcRenderer.invoke('biorhythm:remove-history', birthDate),
+    getDefaultBirthdate: () => ipcRenderer.invoke('biorhythm:get-default-birthdate')
   },
 
   // 玛雅历法相关API

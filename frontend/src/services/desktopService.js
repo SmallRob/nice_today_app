@@ -51,6 +51,28 @@ export const checkSystemHealth = async () => {
 
 // 生物节律服务
 export const desktopBiorhythmService = {
+  // 获取默认出生日期
+  getDefaultBirthdate: async () => {
+    if (!isDesktopApp()) {
+      return {
+        success: false,
+        error: '请在桌面应用中运行此功能'
+      };
+    }
+
+    try {
+      const result = await window.electronAPI.biorhythm.getDefaultBirthdate();
+      // IPC返回的是{success: true, data: actualData}，直接返回result
+      return result;
+    } catch (error) {
+      console.error('获取默认出生日期失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  },
+
   // 获取今日生物节律
   getToday: async (birthDate) => {
     if (!isDesktopApp()) {
