@@ -6,6 +6,12 @@
 
 Nice Today 是一个现代化的生物节律应用，通过分析用户的生物节律数据，提供个性化的健康建议和生活指导。本项目采用 Electron 架构，提供桌面应用程序体验，支持跨平台运行。
 
+## 😊 项目截图
+
+![Nice Today](./images/Snipaste_2025-12-14_12-37-49.png)
+![Nice Today](./images/Snipaste_2025-12-14_12-38-18.png)
+![Nice Today](./images/Snipaste_2025-12-14_12-38-35.png)
+
 ## 🏗️ 技术栈
 
 ### 前端
