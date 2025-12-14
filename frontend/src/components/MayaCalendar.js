@@ -397,7 +397,138 @@ class MayaCalendarUtils {
     
     return result === undefined || result === null ? defaultValue : result;
   }
-  
+
+  // 图腾图标映射
+  static getSealIcon(sealName) {
+    const iconMap = {
+      '红龙': '🐉',
+      '白风': '🌬️',
+      '蓝夜': '🌙',
+      '黄种子': '🌱',
+      '红蛇': '🐍',
+      '白世界桥': '🌉',
+      '蓝手': '🖐️',
+      '黄星星': '⭐',
+      '红月': '🌙',
+      '白狗': '🐕',
+      '蓝猴': '🐒',
+      '黄人': '👤',
+      '红天行者': '🚀',
+      '白巫师': '🧙',
+      '蓝鹰': '🦅',
+      '黄战士': '🛡️',
+      '红地球': '🌎',
+      '白镜': '🪞',
+      '蓝风暴': '🌪️',
+      '黄太阳': '☀️'
+    };
+    return iconMap[sealName] || '🌟';
+  }
+
+  // 调性颜色映射
+  static getToneColor(toneName) {
+    const colorMap = {
+      '磁性': '#FF6B6B',
+      '月亮': '#4ECDC4',
+      '电力': '#45B7D1',
+      '自我存在': '#96CEB4',
+      '超频': '#FECA57',
+      '韵律': '#FF9FF3',
+      '共振': '#54A0FF',
+      '银河': '#5F27CD',
+      '太阳': '#FF9F43',
+      '行星': '#10AC84',
+      '光谱': '#A3CB38',
+      '水晶': '#D980FA',
+      '宇宙': '#5758BB'
+    };
+    return colorMap[toneName] || '#6C5CE7';
+  }
+
+  // 图腾背景颜色映射
+  static getSealBackground(sealName) {
+    const colorMap = {
+      '红龙': 'bg-gradient-to-br from-red-100 to-red-300',
+      '白风': 'bg-gradient-to-br from-gray-100 to-gray-300',
+      '蓝夜': 'bg-gradient-to-br from-blue-100 to-indigo-300',
+      '黄种子': 'bg-gradient-to-br from-yellow-100 to-yellow-300',
+      '红蛇': 'bg-gradient-to-br from-red-200 to-red-400',
+      '白世界桥': 'bg-gradient-to-br from-gray-200 to-gray-400',
+      '蓝手': 'bg-gradient-to-br from-blue-200 to-blue-400',
+      '黄星星': 'bg-gradient-to-br from-yellow-200 to-yellow-400',
+      '红月': 'bg-gradient-to-br from-red-300 to-pink-300',
+      '白狗': 'bg-gradient-to-br from-gray-100 to-white',
+      '蓝猴': 'bg-gradient-to-br from-blue-100 to-blue-200',
+      '黄人': 'bg-gradient-to-br from-yellow-100 to-amber-200',
+      '红天行者': 'bg-gradient-to-br from-red-100 to-orange-200',
+      '白巫师': 'bg-gradient-to-br from-gray-200 to-white',
+      '蓝鹰': 'bg-gradient-to-br from-blue-300 to-indigo-300',
+      '黄战士': 'bg-gradient-to-br from-yellow-300 to-amber-300',
+      '红地球': 'bg-gradient-to-br from-red-100 to-red-200',
+      '白镜': 'bg-gradient-to-br from-gray-100 to-gray-200',
+      '蓝风暴': 'bg-gradient-to-br from-blue-100 to-blue-300',
+      '黄太阳': 'bg-gradient-to-br from-yellow-100 to-yellow-200'
+    };
+    return colorMap[sealName] || 'bg-gradient-to-br from-gray-100 to-gray-200';
+  }
+
+  // 调性符号映射
+  static getToneSymbol(toneName) {
+    const symbolMap = {
+      '磁性': '🧲',
+      '月亮': '🌙',
+      '电力': '⚡',
+      '自我存在': '⚖️',
+      '超频': '📡',
+      '韵律': '♎',
+      '共振': '🎵',
+      '银河': '🌌',
+      '太阳': '☀️',
+      '行星': '🪐',
+      '光谱': '🌈',
+      '水晶': '💎',
+      '宇宙': '🌌'
+    };
+    return symbolMap[toneName] || '🌟';
+  }
+
+  // 获取个性化图腾组合
+  static getUniqueTattoo(tone, seal) {
+    const toneSealCombinations = {
+      '磁性红龙': '🔥',
+      '磁性白风': '💨',
+      '磁性蓝夜': '🌌',
+      '磁性黄种子': '🌱',
+      '月亮红蛇': '🌙🐍',
+      '月亮白世界桥': '🌙🌉',
+      '电力蓝手': '⚡🖐️',
+      '电力黄星星': '⚡⭐',
+      '自我存在红月': '⚖️🌙',
+      '自我存在白狗': '⚖️🐕',
+      '超频蓝猴': '📡🐒',
+      '超频黄人': '📡👤',
+      '韵律红天行者': '♎🚀',
+      '韵律白巫师': '♎🧙',
+      '共振蓝鹰': '🎵🦅',
+      '共振黄战士': '🎵🛡️',
+      '银河红地球': '🌌🌎',
+      '银河白镜': '🌌🪞',
+      '太阳蓝风暴': '☀️🌪️',
+      '太阳黄太阳': '☀️☀️'
+    };
+    
+    const key = `${tone}${seal}`;
+    return toneSealCombinations[key] || `${this.getToneSymbol(tone)}${this.getSealIcon(seal)}`;
+  }
+
+  // 获取图腾标识文字 - 避免重复显示
+  static getSealDisplayText(tone, seal) {
+    // 如果调性和印记相同，只显示一个
+    if (tone === seal) {
+      return seal;
+    }
+    return `${tone} · ${seal}`;
+  }
 
 }
 
@@ -858,45 +989,107 @@ return (
           ))}
         </div>
         
-        {/* 调试信息 */}
-        <div className="mt-2 text-xs text-gray-400 dark:text-gray-500 text-center">
-          调试信息: 总数据量 {mayaInfoList.length}天, 显示前7天
-        </div>
-        
         {/* 提示信息 */}
         <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center whitespace-nowrap overflow-hidden text-ellipsis">
           快速选择标签显示最近7天，使用日期选择器查看任意日期
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 mt-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6 mt-6">
         {/* 左侧：玛雅日历详细信息 */}
-        <div>
-          {/* 玛雅日历基本信息 - 增强视觉效果 */}
-          <div className="mb-6 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 p-6 rounded-xl shadow-lg border border-blue-200 dark:border-blue-700">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium flex items-center text-gray-900 dark:text-white">
-                <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
-                {selectedMayaInfo.date} {selectedMayaInfo.weekday}
-              </h3>
-              <span className="px-3 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full text-sm shadow-sm border border-purple-600">
-                {selectedMayaInfo.maya_tone}
-              </span>
+        <div className="flex flex-col space-y-6">
+          {/* 玛雅日历基本信息 - 完全重新设计 */}
+          <div className={`${MayaCalendarUtils.getSealBackground(selectedMayaInfo.maya_seal_desc.replace(/[的].*/, ''))} dark:from-gray-800 dark:to-gray-900 p-6 rounded-2xl shadow-2xl border-0 relative overflow-hidden flex flex-col justify-between min-h-[400px]`}>
+            {/* 背景装饰 */}
+            <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
+              <div className="text-8xl">{MayaCalendarUtils.getUniqueTattoo(selectedMayaInfo.maya_tone, selectedMayaInfo.maya_seal_desc.replace(/[的].*/, ''))}</div>
             </div>
             
-            <div className="flex flex-col items-center justify-center mb-4">
-              <div className="w-24 h-24 bg-yellow-400 rounded-xl flex items-center justify-center mb-3 shadow-lg border border-yellow-500">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-gray-900">{selectedMayaInfo.maya_kin}</div>
+            <div className="flex items-center justify-between mb-6 relative z-10">
+              <div>
+                <h3 className="text-lg font-semibold flex items-center text-gray-900 dark:text-white">
+                  <span 
+                    className="w-3 h-3 rounded-full mr-3 shadow-sm"
+                    style={{ backgroundColor: MayaCalendarUtils.getToneColor(selectedMayaInfo.maya_tone) }}
+                  ></span>
+                  {selectedMayaInfo.date} {selectedMayaInfo.weekday}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                  KIN {selectedMayaInfo.maya_kin} · {selectedMayaInfo.maya_tone}
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="px-4 py-2 bg-white dark:bg-gray-800 bg-opacity-90 rounded-full shadow-lg border border-white dark:border-gray-700 border-opacity-50">
+                  <span className="text-2xl font-bold" style={{ color: MayaCalendarUtils.getToneColor(selectedMayaInfo.maya_tone) }}>
+                    {MayaCalendarUtils.getToneSymbol(selectedMayaInfo.maya_tone)}
+                  </span>
                 </div>
               </div>
-              <h2 className="text-xl font-bold text-center text-gray-900 dark:text-white">{selectedMayaInfo.maya_seal_desc}</h2>
+            </div>
+            
+            {/* 图腾核心展示区域 */}
+            <div className="flex flex-col items-center justify-center mb-6 relative z-10 flex-grow">
+              <div className="relative mb-4">
+                <div 
+                  className="w-32 h-32 rounded-2xl flex items-center justify-center shadow-2xl border-4 backdrop-blur-sm"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${MayaCalendarUtils.getToneColor(selectedMayaInfo.maya_tone)}20, ${MayaCalendarUtils.getToneColor(selectedMayaInfo.maya_tone)}40)`,
+                    borderColor: MayaCalendarUtils.getToneColor(selectedMayaInfo.maya_tone)
+                  }}
+                >
+                  <div className="text-center">
+                    <div className="text-5xl font-bold text-gray-900 dark:text-white mb-1">
+                      {MayaCalendarUtils.getSealIcon(selectedMayaInfo.maya_seal_desc.replace(/[的].*/, ''))}
+                    </div>
+                    <div 
+                      className="text-lg font-semibold"
+                      style={{ color: MayaCalendarUtils.getToneColor(selectedMayaInfo.maya_tone) }}
+                    >
+                      {selectedMayaInfo.maya_kin}
+                    </div>
+                  </div>
+                </div>
+                {/* 图腾装饰 */}
+                <div 
+                  className="absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg"
+                  style={{ backgroundColor: MayaCalendarUtils.getToneColor(selectedMayaInfo.maya_tone) }}
+                >
+                  {MayaCalendarUtils.getToneSymbol(selectedMayaInfo.maya_tone)}
+                </div>
+              </div>
+              
+              <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-2">
+                {selectedMayaInfo.maya_seal_desc}
+              </h2>
+              
+              <div className="text-center">
+                <span 
+                  className="inline-block px-4 py-1 rounded-full text-white text-sm font-medium shadow-lg"
+                  style={{ backgroundColor: MayaCalendarUtils.getToneColor(selectedMayaInfo.maya_tone) }}
+                >
+                  {MayaCalendarUtils.getSealDisplayText(selectedMayaInfo.maya_tone, selectedMayaInfo.maya_seal_desc.replace(/[的].*/, ''))}
+                </span>
+              </div>
+            </div>
+            
+            {/* 个性化图腾组合 */}
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center bg-white dark:bg-gray-800 bg-opacity-80 rounded-xl px-4 py-2 shadow-lg">
+                <span className="text-2xl mr-2">
+                  {MayaCalendarUtils.getUniqueTattoo(selectedMayaInfo.maya_tone, selectedMayaInfo.maya_seal_desc.replace(/[的].*/, ''))}
+                </span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  今日个性图腾
+                </span>
+              </div>
             </div>
             
             {/* 每日启示语 */}
-            <div className="mt-4 p-4 bg-white dark:bg-gray-700 bg-opacity-70 rounded-xl border border-white dark:border-gray-600 border-opacity-50 shadow-sm">
-              <p className="text-gray-800 dark:text-gray-300 italic text-center">"{selectedMayaInfo.daily_message}"</p>
-              <p className="text-right text-sm mt-2 text-gray-600 dark:text-gray-400">
+            <div className="mt-4 p-4 bg-white dark:bg-gray-800 bg-opacity-90 rounded-xl shadow-lg border border-white dark:border-gray-700 border-opacity-50 relative z-10">
+              <p className="text-gray-800 dark:text-gray-200 italic text-center leading-relaxed">
+                "{selectedMayaInfo.daily_message}"
+              </p>
+              <p className="text-right text-sm mt-3 text-gray-600 dark:text-gray-400">
                 —— {selectedMayaInfo.daily_quote.content} · {selectedMayaInfo.daily_quote.author}
               </p>
             </div>
@@ -978,8 +1171,8 @@ return (
         </div>
         
         {/* 右侧：能量分数和幸运物品 */}
-        <div>
-          {/* 能量分数 - 增强视觉效果 */}
+        <div className="flex flex-col space-y-6">
+          {/* 能量分数 - 完全重新设计，与图腾对齐 */}
           {(() => {
             const energyInfo = MayaCalendarUtils.getTip(energyScores.综合);
             const energyScore = energyScores.综合;
@@ -990,65 +1183,114 @@ return (
                               '#ECC94B';
                               
             return (
-              <div className="mb-6">
-                <h3 className="text-lg font-medium mb-3 text-gray-900 dark:text-white">今日能量分数</h3>
-                <div className={`${energyInfo.bgColor} dark:bg-opacity-20 p-4 rounded-xl border ${energyInfo.borderColor} dark:border-opacity-30 shadow-lg hover:shadow-xl transition-shadow duration-200`}>
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className={`font-bold ${energyInfo.textColor}`}>能量等级: <span className="text-lg">{energyInfo.level}</span></h4>
-                    <div className={`px-3 py-1 bg-white dark:bg-gray-700 rounded-full ${energyInfo.textColor} text-sm border ${energyInfo.borderColor} dark:border-opacity-30 shadow-sm`}>
-                      {energyScore}/100
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border-0 min-h-[400px] flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+                      <span 
+                        className="w-3 h-3 rounded-full mr-3"
+                        style={{ backgroundColor: scoreColor }}
+                      ></span>
+                      今日能量分数
+                    </h3>
+                    <div 
+                      className="px-3 py-1 rounded-full text-white text-sm font-bold shadow-lg"
+                      style={{ backgroundColor: scoreColor }}
+                    >
+                      {energyInfo.level}能量
                     </div>
                   </div>
                   
-                  <div className="flex justify-center mb-4">
-                    <div className="relative w-32 h-32">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-4xl font-bold" style={{ color: scoreColor }}>{energyScore}</span>
-                      </div>
-                      <svg viewBox="0 0 36 36" className="w-full h-full">
-                        <path
-                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  {/* 能量圆环和数字显示 */}
+                  <div className="flex justify-center mb-6">
+                    <div className="relative w-40 h-40">
+                      {/* 背景圆环 */}
+                      <div className="absolute inset-0 rounded-full bg-gray-100 dark:bg-gray-700 shadow-inner"></div>
+                      
+                      {/* 能量圆环 */}
+                      <svg viewBox="0 0 40 40" className="w-full h-full transform -rotate-90">
+                        {/* 背景环 */}
+                        <circle
+                          cx="20"
+                          cy="20"
+                          r="18"
                           fill="none"
-                          stroke="#eee"
+                          stroke="#f0f0f0"
                           strokeWidth="3"
+                          strokeLinecap="round"
                         />
-                        <path
-                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        {/* 能量环 */}
+                        <circle
+                          cx="20"
+                          cy="20"
+                          r="18"
                           fill="none"
                           stroke={scoreColor}
                           strokeWidth="3"
-                          strokeDasharray={`${energyScore}, 100`}
+                          strokeLinecap="round"
+                          strokeDasharray={`${energyScore} 100`}
+                          className="transition-all duration-1000 ease-out"
                         />
                       </svg>
+                      
+                      {/* 中心数字 */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-5xl font-bold" style={{ color: scoreColor }}>{energyScore}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 mt-1">/100</span>
+                      </div>
+                      
+                      {/* 装饰性小点 */}
+                      <div 
+                        className="absolute top-0 right-0 w-4 h-4 rounded-full shadow-lg"
+                        style={{ backgroundColor: scoreColor }}
+                      ></div>
                     </div>
                   </div>
-                  
-                  {/* 能量分数总结提示 */}
-                  <div className="mb-4 p-3 bg-white dark:bg-gray-700 rounded-xl shadow-inner border border-gray-200 dark:border-gray-600">
-                    <p className={`text-sm ${energyInfo.textColor}`}>
+                </div>
+                
+                {/* 能量分析 */}
+                <div>
+                  {/* 能量等级描述 */}
+                  <div 
+                    className="p-4 rounded-xl mb-4 shadow-lg border-l-4"
+                    style={{ 
+                      backgroundColor: `${scoreColor}15`,
+                      borderLeftColor: scoreColor
+                    }}
+                  >
+                    <p className={`text-sm font-medium`} style={{ color: scoreColor }}>
                       {energyInfo.tip}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 italic">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 italic">
                       {energyInfo.suggestion}
                     </p>
                   </div>
                   
-                  <div className="grid grid-cols-4 gap-2">
+                  {/* 详细能量分数 */}
+                  <div className="grid grid-cols-2 gap-3">
                     {Object.entries(energyScores).filter(([key]) => key !== '综合').map(([key, value]) => {
                       // 为每个能量类型确定颜色
-                      const itemColor = value >= 80 ? 'bg-green-600' : 
-                                      value >= 60 ? 'bg-blue-600' : 
-                                      value >= 40 ? 'bg-yellow-500' : 
-                                      'bg-red-500';
+                      const itemColor = value >= 80 ? '#48BB78' : 
+                                      value >= 60 ? '#4299E1' : 
+                                      value >= 40 ? '#ECC94B' : 
+                                      '#FF6B6B';
                       
                       return (
-                        <div key={key} className="text-center">
-                          <div className="text-lg font-semibold text-gray-900 dark:text-white">{value}</div>
-                          <div className="text-xs text-gray-600 dark:text-gray-400">{key}</div>
-                          <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mt-1">
+                        <div 
+                          key={key} 
+                          className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 shadow-sm"
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{key}</span>
+                            <span className="text-sm font-bold" style={{ color: itemColor }}>{value}</span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                             <div
-                              className={`${itemColor} h-2 rounded-full`}
-                              style={{ width: `${value}%` }}
+                              className="h-2 rounded-full transition-all duration-500 ease-out"
+                              style={{ 
+                                width: `${value}%`,
+                                backgroundColor: itemColor
+                              }}
                             ></div>
                           </div>
                         </div>
