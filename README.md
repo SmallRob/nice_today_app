@@ -12,6 +12,15 @@ Nice Today 是一个现代化的生物节律应用，通过分析用户的生物
 ![Nice Today](./images/Snipaste_2025-12-14_12-38-18.png)
 ![Nice Today](./images/Snipaste_2025-12-14_17-31-10.png)
 
+## 📚 文档
+
+项目的详细文档位于 `docs/` 文件夹中，包括：
+- [构建指南](./docs/BUILD_INSTRUCTIONS.md) - 如何构建应用程序
+- [快速开始](./docs/QUICK_START.md) - 快速上手指南
+- [发布指南](./docs/RELEASE_GUIDE.md) - 如何发布新版本
+- [验证步骤](./docs/VERIFICATION_STEPS.md) - 应用程序验证步骤
+- 以及其他技术文档...
+
 ## 🏗️ 技术栈
 
 ### 前端
