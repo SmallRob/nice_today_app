@@ -71,47 +71,59 @@ function createSvgIcon(size) {
         } else if (isCommandAvailable('convert')) {
             execSync(`convert "${svgPath}" -resize ${size}x${size} "${pngPath}"`, { stdio: 'ignore' });
         } else {
-            // 如果没有转换工具，创建简单的BMP图标作为占位
-            createBmpIcon(size);
+            // 如果没有转换工具，创建简单的PNG图标作为占位
+            createSimplePngIcon(size);
         }
     } catch (error) {
-        // 转换失败，创建BMP图标
-        createBmpIcon(size);
+        // 转换失败，创建PNG图标
+        createSimplePngIcon(size);
     }
     
     console.log(`✅ 创建图标: ${size}x${size}.png`);
 }
 
-// 创建简单的BMP图标（纯文本格式）
-function createBmpIcon(size) {
-    const bmpPath = path.join(iconsDir, `icon-${size}x${size}.bmp`);
+// 创建简单的PNG图标（使用纯JavaScript生成）
+function createSimplePngIcon(size) {
     const pngPath = path.join(iconsDir, `icon-${size}x${size}.png`);
     
-    // 创建简单的1x1像素BMP文件（最小尺寸）
-    const bmpHeader = Buffer.from([
-        0x42, 0x4D,             // BM
-        0x3E, 0x00, 0x00, 0x00, // File size: 62 bytes
-        0x00, 0x00, 0x00, 0x00, // Reserved
-        0x3E, 0x00, 0x00, 0x00, // Pixel data offset
-        0x28, 0x00, 0x00, 0x00, // Header size: 40 bytes
-        0x01, 0x00, 0x00, 0x00, // Width: 1
-        0x01, 0x00, 0x00, 0x00, // Height: 1
-        0x01, 0x00,             // Planes: 1
-        0x18, 0x00,             // Bits per pixel: 24
-        0x00, 0x00, 0x00, 0x00, // Compression: none
-        0x00, 0x00, 0x00, 0x00, // Image size: 0
-        0x00, 0x00, 0x00, 0x00, // X pixels per meter
-        0x00, 0x00, 0x00, 0x00, // Y pixels per meter
-        0x00, 0x00, 0x00, 0x00, // Colors used: 0
-        0x00, 0x00, 0x00, 0x00, // Important colors: 0
-        0xFF, 0x00, 0x00,       // Pixel data: blue (BGR format)
-        0x00, 0x00, 0x00        // Padding
+    // 使用纯JavaScript创建PNG数据
+    // 创建一个简单的PNG文件头和数据
+    const pngHeader = Buffer.from([
+        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // PNG signature
+        0x00, 0x00, 0x00, 0x0D,                           // IHDR chunk length
+        0x49, 0x48, 0x44, 0x52,                           // IHDR
+        0x00, 0x00, 0x00, 0x01,                           // Width: 1
+        0x00, 0x00, 0x00, 0x01,                           // Height: 1
+        0x08,                                             // Bit depth: 8
+        0x02,                                             // Color type: RGB
+        0x00,                                             // Compression: deflate
+        0x00,                                             // Filter: none
+        0x00,                                             // Interlace: none
+        0x00, 0x00, 0x00, 0x00,                           // CRC (placeholder)
+        0x00, 0x00, 0x00, 0x00,                           // IDAT chunk length
+        0x49, 0x44, 0x41, 0x54,                           // IDAT
+        0x08, 0x99, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Compressed data
+        0x00, 0x00, 0x00, 0x00,                           // CRC (placeholder)
+        0x00, 0x00, 0x00, 0x00,                           // IEND chunk length
+        0x49, 0x45, 0x4E, 0x44,                           // IEND
+        0xAE, 0x42, 0x60, 0x82                            // IEND CRC
     ]);
     
-    fs.writeFileSync(bmpPath, bmpHeader);
+    // 创建一个更简单的解决方案：使用纯色PNG
+    // 这里我们使用一个更可靠的方法：创建一个1x1像素的PNG
+    const pngData = Buffer.from([
+        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // PNG signature
+        0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, // IHDR chunk
+        0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, // 1x1 pixel
+        0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, // Bit depth, color type
+        0xDE, 0x00, 0x00, 0x00, 0x0C, 0x49, 0x44, 0x41, // IDAT chunk
+        0x54, 0x08, 0x5B, 0x63, 0xF8, 0x0F, 0x00, 0x00, // Compressed data
+        0x02, 0x00, 0x01, 0xE2, 0x21, 0xBC, 0x33, 0x00, // More data
+        0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, // IEND chunk
+        0x42, 0x60, 0x82                                  // IEND
+    ]);
     
-    // 复制BMP文件为PNG（Electron-builder需要PNG格式）
-    fs.copyFileSync(bmpPath, pngPath);
+    fs.writeFileSync(pngPath, pngData);
 }
 
 // 检查命令是否可用
