@@ -1,0 +1,275 @@
+/* 基于ZenCalendar风格的现代化日历组件样式 */
+
+:root {
+  /* 日历颜色变量 */
+  --calendar-bg: #ffffff;
+  --calendar-border: #e5e7eb;
+  --calendar-header-bg: #f9fafb;
+  --calendar-header-text: #1f2937;
+  --calendar-weekday-text: #6b7280;
+  --calendar-weekend-text: #ef4444;
+  --calendar-other-month: #9ca3af;
+  --calendar-today-bg: #fee2e2;
+  --calendar-today-border: #f87171;
+  --calendar-selected-bg: #fef3c7;
+  --calendar-selected-border: #fbbf24;
+  --calendar-event-bg: rgba(59, 130, 246, 0.1);
+  --calendar-event-border: #3b82f6;
+  
+  /* 暗黑模式变量 */
+  --dark-calendar-bg: #1f2937;
+  --dark-calendar-border: #374151;
+  --dark-calendar-header-bg: #111827;
+  --dark-calendar-header-text: #f9fafb;
+  --dark-calendar-weekday-text: #9ca3af;
+  --dark-calendar-weekend-text: #fecaca;
+  --dark-calendar-other-month: #4b5563;
+  --dark-calendar-today-bg: #7f1d1d;
+  --dark-calendar-today-border: #b91c1c;
+  --dark-calendar-selected-bg: #78350f;
+  --dark-calendar-selected-border: #d97706;
+  --dark-calendar-event-bg: rgba(59, 130, 246, 0.2);
+  --dark-calendar-event-border: #60a5fa;
+}
+
+/* 暗黑模式 */
+.dark {
+  --calendar-bg: var(--dark-calendar-bg);
+  --calendar-border: var(--dark-calendar-border);
+  --calendar-header-bg: var(--dark-calendar-header-bg);
+  --calendar-header-text: var(--dark-calendar-header-text);
+  --calendar-weekday-text: var(--dark-calendar-weekday-text);
+  --calendar-weekend-text: var(--dark-calendar-weekend-text);
+  --calendar-other-month: var(--dark-calendar-other-month);
+  --calendar-today-bg: var(--dark-calendar-today-bg);
+  --calendar-today-border: var(--dark-calendar-today-border);
+  --calendar-selected-bg: var(--dark-calendar-selected-bg);
+  --calendar-selected-border: var(--dark-calendar-selected-border);
+  --calendar-event-bg: var(--dark-calendar-event-bg);
+  --calendar-event-border: var(--dark-calendar-event-border);
+}
+
+.zen-calendar-container {
+  background-color: var(--calendar-bg);
+  border: 1px solid var(--calendar-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+/* 日历头部 */
+.zen-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: var(--calendar-header-bg);
+  border-bottom: 1px solid var(--calendar-border);
+}
+
+.zen-calendar-nav-btn {
+  background-color: transparent;
+  border: none;
+  color: var(--calendar-header-text);
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.zen-calendar-nav-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .zen-calendar-nav-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.zen-calendar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--calendar-header-text);
+}
+
+.zen-calendar-today-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.zen-calendar-today-btn:hover {
+  background-color: #2563eb;
+}
+
+/* 星期栏 */
+.zen-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--calendar-border);
+}
+
+.zen-calendar-weekday {
+  padding: 0.75rem 0;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--calendar-weekday-text);
+}
+
+.zen-calendar-weekday.weekend {
+  color: var(--calendar-weekend-text);
+}
+
+/* 日期网格 */
+.zen-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background-color: var(--calendar-border);
+}
+
+.zen-calendar-day {
+  background-color: var(--calendar-bg);
+  min-height: 80px;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.zen-calendar-day:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.dark .zen-calendar-day:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.zen-calendar-day.other-month {
+  color: var(--calendar-other-month);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.dark .zen-calendar-day.other-month {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.zen-calendar-day.today {
+  background-color: var(--calendar-today-bg);
+  border: 1px solid var(--calendar-today-border);
+}
+
+.zen-calendar-day.selected {
+  background-color: var(--calendar-selected-bg);
+  border: 1px solid var(--calendar-selected-border);
+}
+
+.zen-calendar-day-number {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: 0.125rem 0;
+  font-weight: 500;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.zen-calendar-day.today .zen-calendar-day-number {
+  background-color: var(--calendar-today-border);
+  color: white;
+  font-weight: 600;
+}
+
+.zen-calendar-day.selected .zen-calendar-day-number {
+  background-color: var(--calendar-selected-border);
+  color: white;
+  font-weight: 600;
+}
+
+/* 周期阶段指示器 */
+.zen-calendar-phase-indicator {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  margin: 0.125rem auto;
+}
+
+/* 事件标记 */
+.zen-calendar-events {
+  margin-top: 0.25rem;
+  max-height: 42px;
+  overflow-y: auto;
+}
+
+.zen-calendar-event {
+  font-size: 0.625rem;
+  padding: 0.125rem 0.25rem;
+  margin: 0.125rem 0;
+  border-radius: 0.125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-color: var(--calendar-event-bg);
+  border-left: 2px solid var(--calendar-event-border);
+  color: var(--calendar-header-text);
+}
+
+.dark .zen-calendar-event {
+  color: #e5e7eb;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .zen-calendar-day {
+    min-height: 60px;
+    padding: 0.125rem;
+  }
+  
+  .zen-calendar-day-number {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .zen-calendar-events {
+    max-height: 30px;
+  }
+  
+  .zen-calendar-event {
+    font-size: 0.5rem;
+    padding: 0.0625rem 0.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .zen-calendar-header {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .zen-calendar-title {
+    font-size: 1rem;
+  }
+  
+  .zen-calendar-nav-btn {
+    padding: 0.25rem;
+    font-size: 1rem;
+  }
+  
+  .zen-calendar-day {
+    min-height: 50px;
+  }
+  
+  .zen-calendar-day-number {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.75rem;
+  }
+}
