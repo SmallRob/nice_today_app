@@ -35,3 +35,5 @@ women-health-app/node_modules/
 women-health-app/frontend/node_modules/
 women-health-app/electron/node_modules/
 women-health-app/electron/dist/
+women-health-app/electron/dist-women-health/
+women-health-app/electron/dist-women-health/

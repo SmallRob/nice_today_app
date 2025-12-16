@@ -2,7 +2,7 @@
   "appId": "com.nicetoday.womenhealth",
   "productName": "女性健康管理",
   "directories": {
-    "output": "dist"
+    "output": "dist-women-health"
   },
   "files": [
     "women-health-main.js",
@@ -43,8 +43,19 @@
     }
   },
   "win": {
-    "target": "nsis",
-    "icon": "nice_woman.png"
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64", "ia32"]
+      },
+      {
+        "target": "portable",
+        "arch": ["x64", "ia32"]
+      }
+    ],
+    "icon": "nice_woman.png",
+    "publisherName": "Nice Today Team",
+    "verifyUpdateCodeSignature": false
   },
   "linux": {
     "target": "AppImage",

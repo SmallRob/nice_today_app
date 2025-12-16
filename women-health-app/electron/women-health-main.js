@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const isDev = process.env.NODE_ENV === 'development';
@@ -26,7 +26,20 @@ function createWomenHealthWindow() {
     icon: fs.existsSync(iconPath) ? iconPath : undefined,
     show: false,
     backgroundColor: '#fdf2f8', // 粉紫色背景
-    title: '女性健康管理 - Nice Today'
+    title: '女性健康管理 - Nice Today',
+    autoHideMenuBar: true, // 自动隐藏菜单栏
+  });
+
+  // 设置空菜单，隐藏菜单栏
+  Menu.setApplicationMenu(null);
+
+  // 禁用开发者工具快捷键
+  womenHealthWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.key === 'F12' || 
+        (input.control && input.shift && (input.key === 'I' || input.key === 'J')) ||
+        (input.control && input.alt && input.key === 'I')) {
+      event.preventDefault();
+    }
   });
 
   // 加载女性健康管理页面

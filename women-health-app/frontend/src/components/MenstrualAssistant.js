@@ -6,7 +6,7 @@ import MenstrualKnowledgeCard from './MenstrualKnowledgeCard';
 import { DataStorageManager } from '../utils/dataStorage';
 import { PredictionEngine } from '../utils/predictionAlgorithm';
 import { PhysiologicalScoreCalculator } from '../utils/physiologicalScore';
-import DarkModeToggle from './DarkModeToggle';
+import ThemeToggle from './DarkModeToggle';
 
 // 模拟症状数据
 const SYMPTOMS = [
@@ -276,24 +276,24 @@ const MenstrualAssistant = () => {
   const physiologicalInfo = getPhysiologicalInfo();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+    <div className="min-h-screen purple:bg-purple-50 dark:bg-gray-900 pink:bg-pink-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* 优化的头部标题和主题切换 */}
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white flex items-center">
+              <h1 className="text-3xl md:text-4xl font-bold purple:text-purple-900 dark:text-white pink:text-pink-900 flex items-center">
                 <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
                   经期助手
                 </span>
               </h1>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">
+              <p className="mt-2 purple:text-purple-700 dark:text-gray-400 pink:text-pink-700">
                 科学预测您的经期周期，提供个性化健康建议
               </p>
             </div>
             <div className="flex items-center space-x-4">
               {/* 主题切换按钮 */}
-              <DarkModeToggle />
+              <ThemeToggle />
             </div>
           </div>
           
@@ -335,10 +335,10 @@ const MenstrualAssistant = () => {
           {/* 主要日历区域 */}
           <div className="lg:col-span-2 space-y-6">
             {/* 日历视图 */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-sm border purple:border-purple-200 dark:border-gray-700 pink:border-pink-200 p-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">日历视图</h2>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <h2 className="text-xl font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900">日历视图</h2>
+                <div className="text-sm purple:text-purple-600 dark:text-gray-400 pink:text-pink-600">
                   {selectedDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}
                 </div>
               </div>
@@ -350,8 +350,8 @@ const MenstrualAssistant = () => {
             </div>
 
             {/* 经期趋势分析 */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">经期趋势分析</h2>
+            <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-sm border purple:border-purple-200 dark:border-gray-700 pink:border-pink-200 p-6">
+              <h2 className="text-xl font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900 mb-4">经期趋势分析</h2>
               <MenstrualTrendChart 
                 prediction={prediction} 
                 cycles={cycles} 
@@ -366,30 +366,30 @@ const MenstrualAssistant = () => {
           {/* 侧边栏信息 */}
           <div className="space-y-6">
             {/* 周期信息 */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">周期预测</h3>
+            <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-sm border purple:border-purple-200 dark:border-gray-700 pink:border-pink-200 p-6">
+              <h3 className="text-lg font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900 mb-4">周期预测</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">当前周期天数</span>
-                  <span className="font-medium text-gray-900 dark:text-white">第 {cycleDay} 天</span>
+                  <span className="purple:text-purple-700 dark:text-gray-400 pink:text-pink-700">当前周期天数</span>
+                  <span className="font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">第 {cycleDay} 天</span>
                 </div>
                 {prediction && (
                   <>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">预计经期开始</span>
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="purple:text-purple-700 dark:text-gray-400 pink:text-pink-700">预计经期开始</span>
+                      <span className="font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">
                         {prediction.nextPeriodStart.toLocaleDateString('zh-CN')}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">预计排卵期</span>
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="purple:text-purple-700 dark:text-gray-400 pink:text-pink-700">预计排卵期</span>
+                      <span className="font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">
                         {prediction.ovulationDate.toLocaleDateString('zh-CN')}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">预测置信度</span>
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="purple:text-purple-700 dark:text-gray-400 pink:text-pink-700">预测置信度</span>
+                      <span className="font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">
                         {Math.round(prediction.confidence * 100)}%
                       </span>
                     </div>
@@ -398,14 +398,14 @@ const MenstrualAssistant = () => {
                 {statistics && (
                   <>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">平均周期长度</span>
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="purple:text-purple-700 dark:text-gray-400 pink:text-pink-700">平均周期长度</span>
+                      <span className="font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">
                         {statistics.averageCycleLength} 天
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">周期规律性</span>
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="purple:text-purple-700 dark:text-gray-400 pink:text-pink-700">周期规律性</span>
+                      <span className="font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">
                         {statistics.cycleRegularity === 'very_regular' ? '非常规律' : 
                          statistics.cycleRegularity === 'regular' ? '规律' : '不规律'}
                       </span>
@@ -416,9 +416,9 @@ const MenstrualAssistant = () => {
             </div>
 
             {/* 选定日期详情 */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-sm border purple:border-purple-200 dark:border-gray-700 pink:border-pink-200 p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900">
                   {selectedDate.toLocaleDateString('zh-CN', { 
                     month: 'long', 
                     day: 'numeric',
@@ -436,8 +436,8 @@ const MenstrualAssistant = () => {
             </div>
 
             {/* 生理周期阶段展示 */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">当前阶段</h3>
+            <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-sm border purple:border-purple-200 dark:border-gray-700 pink:border-pink-200 p-6">
+              <h3 className="text-lg font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900 mb-4">当前阶段</h3>
               <div className="space-y-4">
                 <div className={`flex items-center p-3 rounded-lg ${
                   currentPhase === 'menstrual' ? 'bg-pink-100 dark:bg-pink-900/30 border border-pink-200 dark:border-pink-700' : 
@@ -451,7 +451,7 @@ const MenstrualAssistant = () => {
                     currentPhase === 'ovulation' ? 'bg-yellow-500' : 'bg-orange-500'
                   }`}></div>
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">
+                    <p className="font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">
                       {currentPhase === 'menstrual' ? '经期' : 
                        currentPhase === 'follicular' ? '卵泡期' : 
                        currentPhase === 'ovulation' ? '排卵期' : '黄体期'}
@@ -467,8 +467,8 @@ const MenstrualAssistant = () => {
             </div>
 
             {/* 综合生理分数 */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">今日生理状态</h3>
+            <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-sm border purple:border-purple-200 dark:border-gray-700 pink:border-pink-200 p-6">
+              <h3 className="text-lg font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900 mb-4">今日生理状态</h3>
               <div className="space-y-4">
                 {/* 综合分数圆环 */}
                 <div className="flex justify-center">
@@ -553,29 +553,29 @@ const MenstrualAssistant = () => {
             </div>
 
             {/* 生活建议 */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">生活建议</h3>
+            <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-sm border purple:border-purple-200 dark:border-gray-700 pink:border-pink-200 p-6">
+              <h3 className="text-lg font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900 mb-4">生活建议</h3>
               <div className="space-y-3">
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">工作建议</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <div className="p-3 blue:bg-blue-50 dark:bg-blue-900/20 pink:bg-blue-100 rounded-lg">
+                  <p className="text-sm font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">工作建议</p>
+                  <p className="text-xs purple:text-purple-700 dark:text-gray-400 pink:text-pink-700 mt-1">
                     {physiologicalInfo.advice.work}
                   </p>
                 </div>
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">运动建议</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <div className="p-3 green:bg-green-50 dark:bg-green-900/20 pink:bg-green-100 rounded-lg">
+                  <p className="text-sm font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">运动建议</p>
+                  <p className="text-xs purple:text-purple-700 dark:text-gray-400 pink:text-pink-700 mt-1">
                     {physiologicalInfo.advice.exercise}
                   </p>
                 </div>
-                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">饮食建议</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <div className="p-3 purple:bg-purple-50 dark:bg-purple-900/20 pink:bg-purple-100 rounded-lg">
+                  <p className="text-sm font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">饮食建议</p>
+                  <p className="text-xs purple:text-purple-700 dark:text-gray-400 pink:text-pink-700 mt-1">
                     {physiologicalInfo.advice.diet}
                   </p>
                 </div>
-                <div className="p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">情绪调节</p>
+                <div className="p-3 pink:bg-pink-50 dark:bg-pink-900/20 pink:bg-pink-100 rounded-lg">
+                  <p className="text-sm font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">情绪调节</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                     {physiologicalInfo.advice.emotion}
                   </p>
@@ -585,8 +585,8 @@ const MenstrualAssistant = () => {
 
             {/* 健康提示 */}
             {physiologicalInfo.tips.length > 0 && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">健康提示</h3>
+              <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-sm border purple:border-purple-200 dark:border-gray-700 pink:border-pink-200 p-6">
+                <h3 className="text-lg font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900 mb-4">健康提示</h3>
                 <div className="space-y-3">
                   {physiologicalInfo.tips.map((tip, index) => (
                     <div 
@@ -597,7 +597,7 @@ const MenstrualAssistant = () => {
                         'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700'
                       }`}
                     >
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{tip.title}</p>
+                      <p className="text-sm font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">{tip.title}</p>
                       <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                         {tip.content}
                       </p>
@@ -608,23 +608,23 @@ const MenstrualAssistant = () => {
             )}
 
             {/* 健康管理建议 */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">健康建议</h3>
+            <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-sm border purple:border-purple-200 dark:border-gray-700 pink:border-pink-200 p-6">
+              <h3 className="text-lg font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900 mb-4">健康建议</h3>
               <div className="space-y-3">
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">饮食建议</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <div className="p-3 blue:bg-blue-50 dark:bg-blue-900/20 pink:bg-blue-100 rounded-lg">
+                  <p className="text-sm font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">饮食建议</p>
+                  <p className="text-xs purple:text-purple-700 dark:text-gray-400 pink:text-pink-700 mt-1">
                     {healthAdvice.diet}
                   </p>
                 </div>
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">运动建议</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <div className="p-3 green:bg-green-50 dark:bg-green-900/20 pink:bg-green-100 rounded-lg">
+                  <p className="text-sm font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">运动建议</p>
+                  <p className="text-xs purple:text-purple-700 dark:text-gray-400 pink:text-pink-700 mt-1">
                     {healthAdvice.exercise}
                   </p>
                 </div>
-                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">情绪调节</p>
+                <div className="p-3 purple:bg-purple-50 dark:bg-purple-900/20 pink:bg-purple-100 rounded-lg">
+                  <p className="text-sm font-medium purple:text-purple-900 dark:text-white pink:text-pink-900">情绪调节</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                     {healthAdvice.emotion}
                   </p>
@@ -667,10 +667,10 @@ const MenstrualAssistant = () => {
       {/* 添加周期记录模态框 */}
       {showCycleForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md">
+          <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-lg w-full max-w-md">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">添加经期记录</h3>
+                <h3 className="text-lg font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900">添加经期记录</h3>
                 <button 
                   onClick={() => setShowCycleForm(false)}
                   className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -683,7 +683,7 @@ const MenstrualAssistant = () => {
               <form onSubmit={handleSubmitCycle}>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium purple:text-purple-700 dark:text-gray-300 pink:text-pink-700 mb-1">
                       经期开始日期
                     </label>
                     <input
@@ -691,12 +691,12 @@ const MenstrualAssistant = () => {
                       name="startDate"
                       value={formData.startDate}
                       onChange={handleFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border purple:border-purple-300 dark:border-gray-600 pink:border-pink-300 rounded-lg purple:bg-purple-50 dark:bg-gray-700 pink:bg-pink-50 purple:text-purple-900 dark:text-white pink:text-pink-900"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium purple:text-purple-700 dark:text-gray-300 pink:text-pink-700 mb-1">
                       周期长度 (天)
                     </label>
                     <input
@@ -706,12 +706,12 @@ const MenstrualAssistant = () => {
                       onChange={handleFormChange}
                       min="20"
                       max="40"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border purple:border-purple-300 dark:border-gray-600 pink:border-pink-300 rounded-lg purple:bg-purple-50 dark:bg-gray-700 pink:bg-pink-50 purple:text-purple-900 dark:text-white pink:text-pink-900"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium purple:text-purple-700 dark:text-gray-300 pink:text-pink-700 mb-1">
                       经期长度 (天)
                     </label>
                     <input
@@ -721,7 +721,7 @@ const MenstrualAssistant = () => {
                       onChange={handleFormChange}
                       min="1"
                       max="10"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border purple:border-purple-300 dark:border-gray-600 pink:border-pink-300 rounded-lg purple:bg-purple-50 dark:bg-gray-700 pink:bg-pink-50 purple:text-purple-900 dark:text-white pink:text-pink-900"
                       required
                     />
                   </div>
@@ -730,7 +730,7 @@ const MenstrualAssistant = () => {
                   <button
                     type="button"
                     onClick={() => setShowCycleForm(false)}
-                    className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                    className="px-4 py-2 purple:text-purple-700 dark:text-gray-300 pink:text-pink-700 purple:bg-purple-200 dark:bg-gray-600 pink:bg-pink-200 rounded-lg hover:purple:bg-purple-300 dark:hover:bg-gray-500 hover:pink:bg-pink-300 transition-colors"
                   >
                     取消
                   </button>
@@ -750,10 +750,10 @@ const MenstrualAssistant = () => {
       {/* 添加健康记录模态框 */}
       {showRecordForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md">
+          <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-lg w-full max-w-md">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">添加健康记录</h3>
+                <h3 className="text-lg font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900">添加健康记录</h3>
                 <button 
                   onClick={() => setShowRecordForm(false)}
                   className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -766,7 +766,7 @@ const MenstrualAssistant = () => {
               <form onSubmit={handleSubmitRecord}>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium purple:text-purple-700 dark:text-gray-300 pink:text-pink-700 mb-1">
                       记录日期
                     </label>
                     <input
@@ -774,12 +774,12 @@ const MenstrualAssistant = () => {
                       name="date"
                       value={recordData.date}
                       onChange={handleRecordChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border purple:border-purple-300 dark:border-gray-600 pink:border-pink-300 rounded-lg purple:bg-purple-50 dark:bg-gray-700 pink:bg-pink-50 purple:text-purple-900 dark:text-white pink:text-pink-900"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium purple:text-purple-700 dark:text-gray-300 pink:text-pink-700 mb-1">
                       症状
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -792,7 +792,7 @@ const MenstrualAssistant = () => {
                             onChange={() => toggleSymptom(symptom.id)}
                             className="rounded text-pink-500 focus:ring-pink-500"
                           />
-                          <label htmlFor={symptom.id} className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                          <label htmlFor={symptom.id} className="ml-2 text-sm purple:text-purple-700 dark:text-gray-300 pink:text-pink-700">
                             {symptom.emoji} {symptom.name}
                           </label>
                         </div>
@@ -800,7 +800,7 @@ const MenstrualAssistant = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium purple:text-purple-700 dark:text-gray-300 pink:text-pink-700 mb-1">
                       情绪状态 (1-5)
                     </label>
                     <div className="flex items-center space-x-2">
@@ -813,13 +813,13 @@ const MenstrualAssistant = () => {
                         onChange={handleRecordChange}
                         className="w-full"
                       />
-                      <span className="text-sm text-gray-700 dark:text-gray-300 w-6">
+                      <span className="text-sm purple:text-purple-700 dark:text-gray-300 pink:text-pink-700 w-6">
                         {recordData.mood}
                       </span>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium purple:text-purple-700 dark:text-gray-300 pink:text-pink-700 mb-1">
                       备注
                     </label>
                     <textarea
@@ -827,7 +827,7 @@ const MenstrualAssistant = () => {
                       value={recordData.notes}
                       onChange={handleRecordChange}
                       rows="3"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 py-2 border purple:border-purple-300 dark:border-gray-600 pink:border-pink-300 rounded-lg purple:bg-purple-50 dark:bg-gray-700 pink:bg-pink-50 purple:text-purple-900 dark:text-white pink:text-pink-900"
                     />
                   </div>
                 </div>
@@ -835,7 +835,7 @@ const MenstrualAssistant = () => {
                   <button
                     type="button"
                     onClick={() => setShowRecordForm(false)}
-                    className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                    className="px-4 py-2 purple:text-purple-700 dark:text-gray-300 pink:text-pink-700 purple:bg-purple-200 dark:bg-gray-600 pink:bg-pink-200 rounded-lg hover:purple:bg-purple-300 dark:hover:bg-gray-500 hover:pink:bg-pink-300 transition-colors"
                   >
                     取消
                   </button>

@@ -2,24 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 主题变量定义 */
 :root {
   --primary-color: #ec4899; /* 粉色主色调 */
   --secondary-color: #8b5cf6; /* 紫色辅助色 */
   --accent-color: #f59e0b; /* 黄色强调色 */
-  --background-light: #f9fafb;
-  --background-dark: #1f2937;
-  --text-light: #1f2937;
-  --text-dark: #f9fafb;
+  --bg-primary-purple: #f5f3ff; /* 淡紫色主背景 */
+  --bg-secondary-purple: #f0ebff; /* 淡紫色次背景 */
+  --bg-tertiary-purple: #ebe5ff; /* 淡紫色第三背景 */
+  --text-primary-purple: #4c1d95; /* 淡紫色主题文字 */
+  --text-secondary-purple: #6b21a8; /* 淡紫色次要文字 */
+  --text-tertiary-purple: #86198f; /* 淡紫色第三文字 */
+  --border-purple: #e9d5ff; /* 淡紫色边框 */
 }
 
-/* 暗黑模式支持 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-light: #111827;
-    --background-dark: #1f2937;
-    --text-light: #f9fafb;
-    --text-dark: #1f2937;
-  }
+/* 暗黑模式变量 */
+.dark {
+  --bg-primary-dark: #1f2937;
+  --bg-secondary-dark: #111827;
+  --bg-tertiary-dark: #374151;
+  --text-primary-dark: #f9fafb;
+  --text-secondary-dark: #d1d5db;
+  --text-tertiary-dark: #9ca3af;
+  --border-dark: #4b5563;
+}
+
+/* 粉色模式变量 */
+.pink {
+  --bg-primary-pink: #fdf2f8;
+  --bg-secondary-pink: #fce7f3;
+  --bg-tertiary-pink: #fbcfe8;
+  --text-primary-pink: #831843;
+  --text-secondary-pink: #9f1239;
+  --text-tertiary-pink: #be185d;
+  --border-pink: #f9a8d4;
+  --primary-color: #ec4899;
+  --secondary-color: #db2777;
+  --accent-color: #f9a8d4;
 }
 
 body {
@@ -29,15 +48,48 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--background-light);
-  color: var(--text-light);
+  background-color: var(--bg-secondary-purple);
+  color: var(--text-primary-purple);
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 淡紫色模式 */
+.purple {
+  background-color: var(--bg-secondary-purple);
+  color: var(--text-primary-purple);
+}
+
+/* 确保body默认使用淡紫色 */
+body {
+  background-color: var(--bg-secondary-purple);
+  color: var(--text-primary-purple);
 }
 
 /* 暗黑模式 */
 .dark {
-  background-color: var(--background-dark);
-  color: var(--text-dark);
+  background-color: var(--bg-secondary-dark);
+  color: var(--text-primary-dark);
+}
+
+/* 确保主要容器元素使用暗黑主题背景 */
+.dark body,
+.dark div,
+.dark section,
+.dark main,
+.dark article {
+  background-color: transparent;
+}
+
+.dark .bg-gray-800, 
+.dark .bg-gray-900,
+.dark .bg-gray-700 {
+  background-color: inherit;
+}
+
+/* 粉色模式 */
+.pink {
+  background-color: var(--bg-secondary-pink);
+  color: var(--text-primary-pink);
 }
 
 /* 日历组件样式 */
@@ -46,19 +98,35 @@ body {
 }
 
 .calendar-header {
-  background-color: white;
+  background-color: var(--bg-primary-purple);
 }
 
 .dark .calendar-header {
-  background-color: #1f2937;
+  background-color: var(--bg-primary-dark);
+}
+
+.purple .calendar-header {
+  background-color: var(--bg-primary-purple);
+}
+
+.pink .calendar-header {
+  background-color: var(--bg-primary-pink);
 }
 
 .calendar-weekday {
-  background-color: white;
+  background-color: var(--bg-primary-purple);
+}
+
+.purple .calendar-weekday {
+  background-color: var(--bg-primary-purple);
 }
 
 .dark .calendar-weekday {
-  background-color: #1f2937;
+  background-color: var(--bg-primary-dark);
+}
+
+.pink .calendar-weekday {
+  background-color: var(--bg-primary-pink);
 }
 
 .calendar-day {
@@ -79,17 +147,33 @@ body {
 
 /* 表单样式 */
 input, select, textarea {
-  background-color: white;
-  border-color: #d1d5db;
-  color: #1f2937;
+  background-color: var(--bg-primary-purple);
+  border-color: var(--border-purple);
+  color: var(--text-primary-purple);
 }
 
 .dark input, 
 .dark select, 
 .dark textarea {
-  background-color: #374151;
-  border-color: #4b5563;
-  color: #f9fafb;
+  background-color: var(--bg-tertiary-dark);
+  border-color: var(--border-dark);
+  color: var(--text-primary-dark);
+}
+
+.purple input, 
+.purple select, 
+.purple textarea {
+  background-color: var(--bg-primary-purple);
+  border-color: var(--border-purple);
+  color: var(--text-primary-purple);
+}
+
+.pink input, 
+.pink select, 
+.pink textarea {
+  background-color: var(--bg-primary-pink);
+  border-color: var(--border-pink);
+  color: var(--text-primary-pink);
 }
 
 /* 按钮样式 */
@@ -105,28 +189,52 @@ button:focus {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--bg-secondary-purple);
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: #374151;
+  background: var(--bg-tertiary-dark);
+}
+
+.purple ::-webkit-scrollbar-track {
+  background: var(--bg-secondary-purple);
+}
+
+.pink ::-webkit-scrollbar-track {
+  background: var(--bg-secondary-pink);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c7d2fe;
+  background: var(--secondary-color);
   border-radius: 4px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #818cf8;
+  background: var(--secondary-color);
+}
+
+.purple ::-webkit-scrollbar-thumb {
+  background: var(--secondary-color);
+}
+
+.pink ::-webkit-scrollbar-thumb {
+  background: var(--border-pink);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a5b4fc;
+  background: var(--accent-color);
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #6366f1;
+  background: var(--accent-color);
+}
+
+.purple ::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+.pink ::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
 }
 
 /* 响应式设计 */
