@@ -1,12 +1,15 @@
 import React from 'react';
 import MenstrualAssistant from './components/MenstrualAssistant';
+import { ThemeProvider } from './context/ThemeContext';
 import './index.css';
 
 function App() {
   return (
-    <div className="App">
-      <MenstrualAssistant />
-    </div>
+    <ThemeProvider>
+      <div className="App">
+        <MenstrualAssistant />
+      </div>
+    </ThemeProvider>
   );
 }
 

@@ -6,6 +6,7 @@ import MenstrualKnowledgeCard from './MenstrualKnowledgeCard';
 import { DataStorageManager } from '../utils/dataStorage';
 import { PredictionEngine } from '../utils/predictionAlgorithm';
 import { PhysiologicalScoreCalculator } from '../utils/physiologicalScore';
+import DarkModeToggle from './DarkModeToggle';
 
 // 模拟症状数据
 const SYMPTOMS = [
@@ -52,7 +53,7 @@ const MenstrualAssistant = () => {
   const [cycleDay, setCycleDay] = useState(1);
   const [showCycleForm, setShowCycleForm] = useState(false);
   const [showRecordForm, setShowRecordForm] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+
   const [formData, setFormData] = useState({
     startDate: '',
     cycleLength: 28,
@@ -65,41 +66,7 @@ const MenstrualAssistant = () => {
     notes: ''
   });
 
-  // 初始化暗黑模式
-  useEffect(() => {
-    // 检查系统偏好和本地存储
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const storedDarkMode = localStorage.getItem('darkMode');
-    
-    // 如果本地存储中有设置，使用本地存储的设置，否则使用系统偏好
-    const initialDarkMode = storedDarkMode !== null ? storedDarkMode === 'true' : prefersDark;
-    
-    setDarkMode(initialDarkMode);
-    
-    // 应用暗黑模式类到根元素
-    if (initialDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
 
-  // 当暗黑模式状态改变时，更新DOM和本地存储
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    
-    // 保存到本地存储
-    localStorage.setItem('darkMode', darkMode.toString());
-  }, [darkMode]);
-
-  // 切换暗黑模式
-  const toggleDarkMode = () => {
-    setDarkMode(prevMode => !prevMode);
-  };
 
   // 初始化数据
   useEffect(() => {
@@ -326,21 +293,7 @@ const MenstrualAssistant = () => {
             </div>
             <div className="flex items-center space-x-4">
               {/* 主题切换按钮 */}
-              <button
-                onClick={toggleDarkMode}
-                className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                aria-label="切换主题"
-              >
-                {darkMode ? (
-                  <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd"></path>
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-                  </svg>
-                )}
-              </button>
+              <DarkModeToggle />
             </div>
           </div>
           
