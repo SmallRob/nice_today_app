@@ -31,3 +31,7 @@ electron_build/dist/
 electron_build/node_modules/
 electron/build_temp/
 electron/dist-women-health/
+women-health-app/node_modules/
+women-health-app/frontend/node_modules/
+women-health-app/electron/node_modules/
+women-health-app/electron/dist/

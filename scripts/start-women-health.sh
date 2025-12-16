@@ -3,7 +3,7 @@
 # 女性健康管理应用启动脚本
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP_PATH="$SCRIPT_DIR/electron/dist-women-health/mac-arm64/女性健康管理.app"
+APP_PATH="$SCRIPT_DIR/electron/dist-women-health/mac-arm64/woman health.app"
 
 # 检查应用是否存在
 if [ -d "$APP_PATH" ]; then

@@ -1,0 +1,67 @@
+{
+  "appId": "com.nicetoday.womenhealth",
+  "productName": "女性健康管理",
+  "directories": {
+    "output": "dist"
+  },
+  "files": [
+    "women-health-main.js",
+    "preload.js",
+    "nice_woman.png",
+    "package.json"
+  ],
+  "extraResources": [
+    {
+      "from": "../frontend/build",
+      "to": "app",
+      "filter": ["**/*"]
+    }
+  ],
+  "mac": {
+    "category": "public.app-category.healthcare-fitness",
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["arm64", "x64"]
+      },
+      {
+        "target": "zip",
+        "arch": ["arm64", "x64"]
+      }
+    ],
+    "icon": "nice_woman.png",
+    "entitlements": "entitlements.mac.plist",
+    "entitlementsInherit": "entitlements.mac.plist",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "extendInfo": {
+      "NSHumanReadableCopyright": "Copyright © 2024 Nice Today Team",
+      "CFBundleDisplayName": "女性健康管理",
+      "CFBundleName": "女性健康管理",
+      "CFBundleIdentifier": "com.nicetoday.womenhealth",
+      "LSApplicationCategoryType": "public.app-category.healthcare-fitness"
+    }
+  },
+  "win": {
+    "target": "nsis",
+    "icon": "nice_woman.png"
+  },
+  "linux": {
+    "target": "AppImage",
+    "icon": "nice_woman.png",
+    "category": "Health"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
+  },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "nicetoday",
+      "repo": "women-health-app"
+    }
+  ]
+}

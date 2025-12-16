@@ -1,0 +1,31 @@
+{
+  "name": "women-health-electron",
+  "version": "1.0.0",
+  "description": "女性健康管理Electron应用",
+  "main": "women-health-main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "dev:women-health": "NODE_ENV=development electron .",
+    "build": "electron-builder",
+    "dist": "electron-builder",
+    "dist:women-health": "electron-builder --config electron-builder-women-health.json",
+    "dist:mac:women-health": "electron-builder --mac --config electron-builder-women-health.json",
+    "dist:win:women-health": "electron-builder --win --config electron-builder-women-health.json",
+    "dist:linux:women-health": "electron-builder --linux --config electron-builder-women-health.json"
+  },
+  "keywords": [
+    "electron",
+    "women",
+    "health"
+  ],
+  "author": "Nice Today Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^25.9.8",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "electron-updater": "^5.3.0"
+  }
+}

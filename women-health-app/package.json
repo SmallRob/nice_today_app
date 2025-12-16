@@ -1,0 +1,28 @@
+{
+  "name": "women-health-app",
+  "version": "1.0.0",
+  "description": "女性健康管理独立应用",
+  "main": "electron/women-health-main.js",
+  "scripts": {
+    "start": "concurrently \"npm run start:renderer\" \"npm run start:main\"",
+    "start:renderer": "cd frontend && npm start",
+    "start:main": "cd electron && npm run dev:women-health",
+    "build": "node scripts/build-women-health.js",
+    "dist": "cd electron && npm run dist:women-health",
+    "dist:mac": "cd electron && npm run dist:mac:women-health",
+    "dist:win": "cd electron && npm run dist:win:women-health",
+    "dist:linux": "cd electron && npm run dist:linux:women-health"
+  },
+  "keywords": [
+    "women",
+    "health",
+    "calendar",
+    "electron",
+    "react"
+  ],
+  "author": "Nice Today Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  }
+}

@@ -1,6 +1,11 @@
 module.exports = {
   webpack: {
-    configure: (webpackConfig) => {
+    configure: (webpackConfig, { env, paths }) => {
+      // 如果指定了自定义入口文件，则使用它
+      if (process.env.ENTRY_FILE) {
+        paths.appIndexJs = require('path').resolve(__dirname, process.env.ENTRY_FILE);
+      }
+      
       // 添加 fallback 配置来解决 axios 的 http 模块问题
       webpackConfig.resolve.fallback = {
         ...webpackConfig.resolve.fallback,

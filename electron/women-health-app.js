@@ -27,7 +27,8 @@ function createWindow() {
 
   // 加载女性健康管理页面
   if (isDev) {
-    mainWindow.loadURL('http://localhost:3000/women-health')
+    // 在开发模式下，我们假设女性健康管理应用运行在3001端口
+    mainWindow.loadURL('http://localhost:3001')
       .catch(err => {
         console.error('Failed to load dev URL:', err);
         // 回退到生产模式
@@ -35,12 +36,18 @@ function createWindow() {
       });
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, 'public/women-health.html'))
-      .catch(err => {
-        console.error('Failed to load production file:', err);
-        // 尝试创建基本页面
-        loadBasicPage();
-      });
+    // 在生产模式下，加载构建好的女性健康管理应用
+    const womenHealthIndexPath = path.join(__dirname, 'public/women-health/index.html');
+    if (require('fs').existsSync(womenHealthIndexPath)) {
+      mainWindow.loadFile(womenHealthIndexPath)
+        .catch(err => {
+          console.error('Failed to load women health app:', err);
+          loadBasicPage();
+        });
+    } else {
+      console.error('Women health app not found at:', womenHealthIndexPath);
+      loadBasicPage();
+    }
   }
 
   // 窗口准备就绪时显示
