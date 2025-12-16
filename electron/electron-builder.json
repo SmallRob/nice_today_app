@@ -9,6 +9,7 @@
   "files": [
     "main.js",
     "preload.js",
+    "women-health-main.js",
     "package.json",
     {
       "from": "public",

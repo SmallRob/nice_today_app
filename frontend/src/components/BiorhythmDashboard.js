@@ -2,13 +2,9 @@ import React, { useState, useEffect } from 'react';
 import BiorhythmTab from './BiorhythmTab';
 import DressInfo from './DressInfo';
 import MayaCalendar from './MayaCalendar';
-import ZodiacEnergyTab from './ZodiacEnergyTab';
-import { unifiedService, checkSystemHealth } from '../services/desktopService';
-import { BiorhythmIcon, MayaIcon, DressIcon, IconLibrary } from './IconLibrary';
+import { checkSystemHealth } from '../services/desktopService';
+import { BiorhythmIcon, MayaIcon, DressIcon, WomenHealthIcon, IconLibrary } from './IconLibrary';
 import VersionInfo from './VersionInfo';
-
-// 生肖能量图标组件
-const ZodiacIcon = (props) => <IconLibrary.Icon name="zodiac" {...props} />;
 
 const BiorhythmDashboard = ({ appInfo = {} }) => {
   const [loading, setLoading] = useState(true);
@@ -17,6 +13,7 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
     biorhythm: false,
     maya: false,
     dress: false,
+    womenHealth: true, // 女性健康管理模块默认可用，基于本地计算
     // zodiacEnergy状态已临时移除，但保留以便将来可能需要恢复
     // zodiacEnergy: false
   });
@@ -33,6 +30,7 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
             biorhythm: healthResult.data.services?.biorhythm || false,
             maya: healthResult.data.services?.maya || false,
             dress: healthResult.data.services?.dress || false,
+            womenHealth: true, // 女性健康管理模块基于本地计算，默认可用
             // zodiacEnergy状态已临时移除，但保留以便将来可能需要恢复
             // zodiacEnergy: healthResult.data.services?.zodiacEnergy || false
           });
@@ -46,6 +44,7 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
         biorhythm: true,
         maya: true,
         dress: true,
+        womenHealth: true, // 女性健康管理模块在Web环境下也可用
         // zodiacEnergy状态已临时移除，但保留以便将来可能需要恢复
         // zodiacEnergy: true
       });
@@ -80,7 +79,7 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
       icon: DressIcon,
       description: '根据五行能量推荐生活饮食与穿衣指南',
       color: 'green'
-    },
+    }
     // 生肖能量指南标签已临时移除，但代码保留以便将来可能需要恢复
     // { 
     //   id: 'zodiac', 
@@ -90,6 +89,17 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
     //   color: 'purple'
     // }
   ];
+
+  // 导航到女性健康管理独立页面
+  const navigateToWomenHealth = () => {
+    if (window.electronAPI) {
+      // Electron环境下打开新窗口
+      window.electronAPI.openWomenHealthWindow?.();
+    } else {
+      // Web环境下跳转到独立页面
+      window.open('/women-health', '_blank');
+    }
+  };
 
   if (loading) {
     return (
@@ -122,14 +132,14 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
             
             {/* 服务状态指示器 */}
             <div className={`px-4 py-2 rounded-full text-sm font-medium ${
-              appInfo.isDesktop && serviceStatus.biorhythm && serviceStatus.maya && serviceStatus.dress
+              appInfo.isDesktop && serviceStatus.biorhythm && serviceStatus.maya && serviceStatus.dress && serviceStatus.womenHealth
                 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
                 : appInfo.isDesktop
                 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                 : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
             }`}>
               {appInfo.isDesktop ? (
-                serviceStatus.biorhythm && serviceStatus.maya && serviceStatus.dress ? 
+                serviceStatus.biorhythm && serviceStatus.maya && serviceStatus.dress && serviceStatus.womenHealth ? 
                   '✅ 所有服务就绪' : '⚠️ 部分服务异常'
               ) : (
                 '🌐 Web版本'
@@ -140,7 +150,7 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
       </div>
 
       {/* 服务状态提示 */}
-      {appInfo.isDesktop && !(serviceStatus.biorhythm && serviceStatus.maya && serviceStatus.dress) && (
+      {appInfo.isDesktop && !(serviceStatus.biorhythm && serviceStatus.maya && serviceStatus.dress && serviceStatus.womenHealth) && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
           <div className="bg-yellow-50 dark:bg-yellow-900 dark:bg-opacity-20 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 rounded-lg shadow-sm">
             <div className="flex items-start">
@@ -155,6 +165,7 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
                     {!serviceStatus.biorhythm && <li>生物节律计算服务异常</li>}
                     {!serviceStatus.maya && <li>玛雅历法计算服务异常</li>}
                     {!serviceStatus.dress && <li>穿搭建议服务异常</li>}
+                    {!serviceStatus.womenHealth && <li>女性健康管理服务异常</li>}
                     {/* 生肖能量服务状态检查已临时移除，但代码保留以便将来可能需要恢复 */}
                     {/* {!serviceStatus.zodiacEnergy && <li>生肖能量计算服务异常</li>} */}
                   </ul>
@@ -238,6 +249,25 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
               </p>
             </div>
           ))}
+          
+          {/* 女性健康管理独立页面卡片 */}
+          <div 
+            onClick={navigateToWomenHealth}
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 cursor-pointer hover:shadow-lg transition-all duration-200 hover:border-pink-300 dark:hover:border-pink-600"
+          >
+            <div className="w-12 h-12 bg-pink-100 dark:bg-pink-900 dark:bg-opacity-30 rounded-full flex items-center justify-center text-pink-600 dark:text-pink-400 mb-4">
+              <WomenHealthIcon size={24} />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">女性健康管理</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
+              经期预测、健康记录、周期分析，贴心关怀女性健康
+            </p>
+            <div className="flex items-center text-pink-600 dark:text-pink-400 text-sm font-medium">
+              <span>点击进入独立页面</span>
+              <span className="ml-1">→</span>
+            </div>
+          </div>
+          
           {/* 生肖能量说明卡片已临时移除，但代码保留以便将来可能需要恢复 */}
           {/* {tabs.filter(tab => tab.id === 'zodiac').map((tab) => (
             <div key={tab.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6">

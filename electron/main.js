@@ -1,10 +1,14 @@
 const { app, BrowserWindow, ipcMain, Menu } = require('electron')
 const path = require('path')
 const fs = require('fs')
+const { spawn } = require('child_process')
 const isDev = process.env.NODE_ENV === 'development'
 
 // 使用新的JavaScript后端服务模块
 const { JavaScriptBackendService } = require('./services/javascriptBackendService')
+
+// 女性健康管理窗口模块
+const { createWomenHealthWindow, getWomenHealthWindow } = require('./women-health-main.js')
 
 let mainWindow
 let backendService
@@ -353,3 +357,156 @@ ipcMain.handle('system:health-check', async () => {
     throw error
   }
 })
+
+// 女性健康管理窗口相关
+ipcMain.handle('women-health:open-window', async () => {
+  try {
+    // 首先尝试启动独立应用
+    if (process.platform === 'darwin') {
+      // macOS 系统
+      let womenHealthAppPath;
+      
+      // 优先尝试ARM64版本
+      womenHealthAppPath = path.join(__dirname, 'dist-women-health/mac-arm64/女性健康管理.app');
+      
+      // 如果ARM64版本不存在，尝试x64版本
+      if (!fs.existsSync(womenHealthAppPath)) {
+        womenHealthAppPath = path.join(__dirname, 'dist-women-health/mac/女性健康管理.app');
+      }
+      
+      // 检查独立应用是否存在
+      if (fs.existsSync(womenHealthAppPath)) {
+        // 使用 open 命令启动独立应用
+        spawn('open', [womenHealthAppPath], { detached: true });
+        return { success: true, launched: 'standalone' };
+      }
+    } else if (process.platform === 'win32') {
+      // Windows 系统
+      const womenHealthAppPath = path.join(__dirname, 'dist-women-health/win/女性健康管理.exe');
+      
+      // 检查独立应用是否存在
+      if (fs.existsSync(womenHealthAppPath)) {
+        // 启动独立应用
+        spawn(womenHealthAppPath, [], { detached: true });
+        return { success: true, launched: 'standalone' };
+      }
+    }
+    
+    // 如果独立应用不存在，则回退到窗口模式
+    let womenHealthWindow = getWomenHealthWindow();
+    if (!womenHealthWindow) {
+      womenHealthWindow = createWomenHealthWindow();
+    }
+    
+    if (womenHealthWindow.isMinimized()) {
+      womenHealthWindow.restore();
+    }
+    
+    womenHealthWindow.focus();
+    
+    return { success: true, launched: 'window' };
+  } catch (error) {
+    console.error('打开女性健康管理失败:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('women-health:close-window', async () => {
+  try {
+    const womenHealthWindow = getWomenHealthWindow();
+    if (womenHealthWindow) {
+      womenHealthWindow.close();
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('关闭女性健康管理窗口失败:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// 应用菜单中添加女性健康管理选项
+const updateApplicationMenu = () => {
+  const template = [
+    {
+      label: '文件',
+      submenu: [
+        {
+          label: '女性健康管理',
+          accelerator: 'CmdOrCtrl+W',
+          click: () => {
+            ipcMain.handle('women-health:open-window', async () => {
+              let womenHealthWindow = getWomenHealthWindow();
+              if (!womenHealthWindow) {
+                womenHealthWindow = createWomenHealthWindow();
+              }
+              womenHealthWindow.focus();
+              return { success: true };
+            });
+          }
+        },
+        { type: 'separator' },
+        { role: 'quit', label: '退出' }
+      ]
+    },
+    {
+      label: '编辑',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' }
+      ]
+    },
+    {
+      label: '窗口',
+      submenu: [
+        { role: 'minimize' },
+        { role: 'close' },
+        { type: 'separator' },
+        {
+          label: '女性健康管理',
+          click: () => {
+            let womenHealthWindow = getWomenHealthWindow();
+            if (!womenHealthWindow) {
+              womenHealthWindow = createWomenHealthWindow();
+            }
+            womenHealthWindow.focus();
+          }
+        }
+      ]
+    },
+    {
+      label: '帮助',
+      submenu: [
+        {
+          label: '关于',
+          click: () => {
+            require('electron').dialog.showMessageBox(mainWindow, {
+              type: 'info',
+              title: '关于',
+              message: 'Nice Today - 生物节律与玛雅历法应用',
+              detail: '版本 1.0.0\n本地化桌面版本\n包含女性健康管理模块'
+            });
+          }
+        }
+      ]
+    }
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+};
+
+// 应用准备就绪时更新菜单
+app.whenReady().then(() => {
+  createWindow();
+  updateApplicationMenu();
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
+});

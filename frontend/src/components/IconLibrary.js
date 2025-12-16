@@ -144,6 +144,7 @@ const IconComponent = ({
 export const BiorhythmIcon = (props) => <IconComponent name="biorhythm" {...props} />;
 export const MayaIcon = (props) => <IconComponent name="maya" {...props} />;
 export const DressIcon = (props) => <IconComponent name="dress" {...props} />;
+export const WomenHealthIcon = (props) => <IconComponent name="heart" {...props} />;
 export const CalendarIcon = (props) => <IconComponent name="calendar" {...props} />;
 export const HeartIcon = (props) => <IconComponent name="heart" {...props} />;
 export const SunIcon = (props) => <IconComponent name="sun" {...props} />;

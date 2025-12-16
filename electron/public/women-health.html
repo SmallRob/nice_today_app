@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Woman Health</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #fdf2f8;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background-color: #be185d;
+            color: white;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .app-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .app-version {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        main {
+            flex: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .status-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .status-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .status-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #fce7f3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 24px;
+        }
+        .status-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .status-subtitle {
+            color: #666;
+            margin: 5px 0 0;
+            font-size: 14px;
+        }
+        .loading-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f4f6;
+            border-top: 2px solid #be185d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .feature-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .feature-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #be185d;
+        }
+        .feature-description {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1 class="app-title">Woman Health</h1>
+                    <div class="app-version">v1.0.0</div>
+                </div>
+                <div id="status-indicator">
+                    <div class="loading-indicator"></div>
+                </div>
+            </div>
+        </header>
+        <main>
+            <div class="status-card">
+                <div class="status-header">
+                    <div class="status-icon">♀</div>
+                    <div>
+                        <h2 class="status-title">应用状态</h2>
+                        <p class="status-subtitle">正在初始化女性健康管理应用</p>
+                    </div>
+                </div>
+                <div id="status-message">
+                    <p>应用启动中，请稍候...</p>
+                </div>
+            </div>
+            
+            <div class="feature-list">
+                <div class="feature-card">
+                    <h3 class="feature-title">生理周期跟踪</h3>
+                    <p class="feature-description">记录和预测生理周期，提供个性化健康建议</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">健康数据分析</h3>
+                    <p class="feature-description">分析健康数据趋势，提供直观的健康报告</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">个性化建议</h3>
+                    <p class="feature-description">根据个人健康状况，提供定制化的生活建议</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">症状记录</h3>
+                    <p class="feature-description">记录身体状况和症状，帮助了解健康模式</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusMessage = document.getElementById('status-message');
+            const statusIndicator = document.getElementById('status-indicator');
+            
+            // 模拟应用初始化过程
+            setTimeout(() => {
+                statusMessage.innerHTML = '<p>正在加载健康数据...</p>';
+            }, 500);
+            
+            setTimeout(() => {
+                statusMessage.innerHTML = '<p>正在初始化界面组件...</p>';
+            }, 1000);
+            
+            setTimeout(() => {
+                statusMessage.innerHTML = '<p>应用已就绪！</p>';
+                statusIndicator.innerHTML = '<span style="color: white;">✓</span>';
+            }, 1500);
+            
+            // 检查是否有Electron API
+            if (window.electronAPI && window.electronAPI.isReady()) {
+                setTimeout(() => {
+                    statusMessage.innerHTML = '<p>Woman Health 应用已完全加载并准备就绪</p>';
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
