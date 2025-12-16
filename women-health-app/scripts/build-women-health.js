@@ -57,7 +57,7 @@ function buildElectron() {
 function testBuildResult() {
     console.log('\n🧪 测试构建结果...');
     
-    const distDir = path.join(__dirname, '../electron/dist');
+    const distDir = path.join(__dirname, '../electron/dist-women-health');
     
     if (fs.existsSync(distDir)) {
         const files = fs.readdirSync(distDir);
@@ -86,7 +86,7 @@ function testBuildResult() {
 // 显示构建结果
 function showBuildResults() {
     console.log('\n📁 构建结果:');
-    const distDir = path.join(__dirname, '../electron/dist');
+    const distDir = path.join(__dirname, '../electron/dist-women-health');
     
     if (fs.existsSync(distDir)) {
         const files = fs.readdirSync(distDir);
