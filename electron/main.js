@@ -70,6 +70,15 @@ function createWindow() {
 
   // 设置菜单
   createMenu()
+  
+  // 禁用F12快捷键（仅在非开发环境）
+  if (!isDev) {
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+      if (input.key === 'F12') {
+        event.preventDefault()
+      }
+    })
+  }
 }
 
 function createMenu() {
@@ -84,13 +93,14 @@ function createMenu() {
             mainWindow.reload()
           }
         },
-        {
+        // 在生产环境中禁用开发者工具
+        ...(isDev ? [{
           label: '开发者工具',
           accelerator: 'F12',
           click: () => {
             mainWindow.webContents.toggleDevTools()
           }
-        },
+        }] : []),
         { type: 'separator' },
         {
           label: '退出',
@@ -357,65 +367,3 @@ ipcMain.handle('system:health-check', async () => {
   }
 })
 
-// 应用菜单
-const createMenu = () => {
-  const template = [
-    {
-      label: '文件',
-      submenu: [
-        {
-          label: '重新加载',
-          accelerator: 'CmdOrCtrl+R',
-          click: () => {
-            mainWindow.reload();
-          }
-        },
-        {
-          label: '开发者工具',
-          accelerator: 'F12',
-          click: () => {
-            mainWindow.webContents.toggleDevTools();
-          }
-        },
-        { type: 'separator' },
-        {
-          label: '退出',
-          accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
-          click: () => {
-            app.quit();
-          }
-        }
-      ]
-    },
-    {
-      label: '编辑',
-      submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
-        { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' }
-      ]
-    },
-    {
-      label: '帮助',
-      submenu: [
-        {
-          label: '关于',
-          click: () => {
-            require('electron').dialog.showMessageBox(mainWindow, {
-              type: 'info',
-              title: '关于',
-              message: 'Nice Today - 生物节律与玛雅历法应用',
-              detail: '版本 1.0.0\n本地化桌面版本'
-            });
-          }
-        }
-      ]
-    }
-  ];
-
-  const menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);
-};
