@@ -35,9 +35,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       webSecurity: !isDev
     },
-    icon: process.platform === 'win32' 
-      ? path.join(__dirname, 'build/icons/icon-256x256.ico')
-      : path.join(__dirname, 'build/icons/icon-256x256.png'),
+    icon: path.join(__dirname, 'nice_day.png'),
     titleBarStyle: 'default',
     autoHideMenuBar: true, // 隐藏菜单栏
     show: false
