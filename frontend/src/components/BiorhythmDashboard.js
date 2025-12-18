@@ -3,6 +3,7 @@ import { checkSystemHealth } from '../services/desktopService';
 import { BiorhythmIcon, MayaIcon, DressIcon, IconLibrary } from './IconLibrary';
 import VersionInfo from './VersionInfo';
 import { LazyLoader, ErrorBoundary } from '../utils/lazyLoader';
+import { getComponentClasses, darkMode } from '../config/designSystem';
 
 // 使用React.lazy实现组件懒加载
 const BiorhythmTab = lazy(() => import('./BiorhythmTab'));
@@ -109,36 +110,36 @@ const BiorhythmDashboard = ({ appInfo = {} }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900">
       {/* 顶部导航栏 */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
+      <div className={`bg-white dark:bg-gray-800 shadow-sm border-b ${darkMode.border.primary}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white mr-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white mr-3 shadow-md">
                 <IconLibrary.Icon name="star" size={24} />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">生物节律生活助手</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <h1 className={`text-2xl font-bold ${darkMode.text.primary}`}>生物节律生活助手</h1>
+                <p className={`text-sm ${darkMode.text.secondary}`}>
                   {appInfo.isDesktop ? '桌面版 - 本地化计算服务' : 'Web版 - 功能受限'}
                 </p>
               </div>
             </div>
             
             {/* 服务状态指示器 */}
-        <div className={`px-4 py-2 rounded-full text-sm font-medium ${
-          appInfo.isDesktop && allServicesReady
-            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
-            : appInfo.isDesktop
-            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-            : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-        }`}>
-          {appInfo.isDesktop ? (
-            allServicesReady ? 
-              '✅ 所有服务就绪' : '⚠️ 部分服务异常'
-          ) : (
-            '🌐 Web版本'
-          )}
-        </div>
+            <div className={`px-4 py-2 rounded-full text-sm font-medium shadow-sm ${
+              appInfo.isDesktop && allServicesReady
+                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                : appInfo.isDesktop
+                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+            }`}>
+              {appInfo.isDesktop ? (
+                allServicesReady ? 
+                  '✅ 所有服务就绪' : '⚠️ 部分服务异常'
+              ) : (
+                '🌐 Web版本'
+              )}
+            </div>
           </div>
         </div>
       </div>

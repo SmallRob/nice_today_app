@@ -30,7 +30,7 @@ function cleanBuildDir() {
 function buildFrontend() {
     console.log('\n📦 构建React前端应用...');
     try {
-        execSync('cd frontend && npm run build', { stdio: 'inherit' });
+        execSync('npm run build', { stdio: 'inherit', cwd: path.join(__dirname, '..', 'frontend') });
         console.log('✅ 前端构建完成');
     } catch (error) {
         console.error('❌ 前端构建失败:', error.message);
@@ -42,7 +42,7 @@ function buildFrontend() {
 function generateIcons() {
     console.log('\n🎨 转换应用图标...');
     try {
-        execSync('node scripts/convert-icon.js', { stdio: 'inherit' });
+        execSync('node scripts/convert-icon.js', { stdio: 'inherit', cwd: path.join(__dirname, '..') });
         console.log('✅ 图标转换完成');
     } catch (error) {
         console.error('❌ 图标转换失败:', error.message);
@@ -53,8 +53,8 @@ function generateIcons() {
 // 复制前端构建文件到Electron目录
 function copyFrontendToElectron() {
     console.log('\n📁 复制前端文件到Electron目录...');
-    const frontendBuildDir = 'frontend/build';
-    const electronPublicDir = 'electron/public';
+    const frontendBuildDir = path.join(__dirname, '..', 'frontend', 'build');
+    const electronPublicDir = path.join(__dirname, '..', 'electron', 'public');
     
     // 确保目标目录存在
     if (!fs.existsSync(electronPublicDir)) {
@@ -77,9 +77,9 @@ function buildMacOS(arch) {
     console.log(`\n🍎 构建macOS应用 (${archName})...`);
     
     try {
-        const buildCommand = `cd electron && npx electron-builder --mac --${arch}`;
+        const buildCommand = `npx electron-builder --mac --${arch}`;
         console.log(`执行命令: ${buildCommand}`);
-        execSync(buildCommand, { stdio: 'inherit' });
+        execSync(buildCommand, { stdio: 'inherit', cwd: path.join(__dirname, '..', 'electron') });
         console.log(`✅ macOS应用 (${archName}) 构建完成`);
     } catch (error) {
         console.error(`❌ macOS应用 (${archName}) 构建失败:`, error.message);
