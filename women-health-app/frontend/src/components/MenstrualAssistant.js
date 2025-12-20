@@ -666,8 +666,8 @@ const MenstrualAssistant = () => {
 
       {/* 添加周期记录模态框 */}
       {showCycleForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-lg w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-50 rounded-xl shadow-lg w-full max-w-md">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900">添加经期记录</h3>
@@ -749,8 +749,8 @@ const MenstrualAssistant = () => {
 
       {/* 添加健康记录模态框 */}
       {showRecordForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-100 rounded-xl shadow-lg w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="purple:bg-purple-100 dark:bg-gray-800 pink:bg-pink-50 rounded-xl shadow-lg w-full max-w-md">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold purple:text-purple-900 dark:text-white pink:text-pink-900">添加健康记录</h3>
