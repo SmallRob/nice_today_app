@@ -37,3 +37,5 @@ women-health-app/electron/node_modules/
 women-health-app/electron/dist/
 women-health-app/electron/dist-women-health/
 electron/public/
+women-health-app/frontend/build/
+women-health-app/frontend/build/asset-manifest.json

@@ -28,6 +28,25 @@ function buildFrontend() {
     console.log('\n📦 构建女性健康管理前端应用...');
     try {
         const frontendPath = path.join(__dirname, '../frontend');
+        
+        // 检查是否存在package.json
+        const packageJsonPath = path.join(frontendPath, 'package.json');
+        if (!fs.existsSync(packageJsonPath)) {
+            console.error('❌ 前端项目不存在，请检查路径:', frontendPath);
+            process.exit(1);
+        }
+        
+        // 安装依赖（如果node_modules不存在）
+        const nodeModulesPath = path.join(frontendPath, 'node_modules');
+        if (!fs.existsSync(nodeModulesPath)) {
+            console.log('📦 安装前端依赖...');
+            execSync('npm install', { 
+                stdio: 'inherit',
+                cwd: frontendPath
+            });
+        }
+        
+        // 构建前端
         execSync('npm run build', { 
             stdio: 'inherit',
             cwd: frontendPath
@@ -45,9 +64,45 @@ function buildElectron() {
     
     try {
         const electronPath = path.join(__dirname, '../electron');
-        const buildCommand = 'npx electron-builder --config electron-builder-women-health.json';
         
-        console.log(`执行命令: ${buildCommand}`);
+        // 检查是否存在package.json
+        const packageJsonPath = path.join(electronPath, 'package.json');
+        if (!fs.existsSync(packageJsonPath)) {
+            console.error('❌ Electron项目不存在，请检查路径:', electronPath);
+            process.exit(1);
+        }
+        
+        // 安装依赖（如果node_modules不存在）
+        const nodeModulesPath = path.join(electronPath, 'node_modules');
+        if (!fs.existsSync(nodeModulesPath)) {
+            console.log('📦 安装Electron依赖...');
+            execSync('npm install', { 
+                stdio: 'inherit',
+                cwd: electronPath
+            });
+        }
+        
+        // 准备图标文件
+        console.log('🎨 准备应用图标...');
+        const buildDir = path.join(electronPath, 'build');
+        if (!fs.existsSync(buildDir)) {
+            fs.mkdirSync(buildDir, { recursive: true });
+        }
+        
+        // 使用nice_woman.png作为图标
+        const iconPath = path.join(electronPath, 'nice_woman.png');
+        if (fs.existsSync(iconPath)) {
+            // 复制图标到build目录
+            fs.copyFileSync(iconPath, path.join(buildDir, 'icon.png'));
+            console.log('✅ 使用女性健康管理图标: nice_woman.png');
+        } else {
+            console.error('❌ 图标文件不存在:', iconPath);
+            process.exit(1);
+        }
+        
+        // 构建Electron应用
+        console.log('⚡ 开始构建Electron应用...');
+        const buildCommand = 'npx electron-builder --config electron-builder-women-health.json';
         execSync(buildCommand, { 
             stdio: 'inherit',
             cwd: electronPath
