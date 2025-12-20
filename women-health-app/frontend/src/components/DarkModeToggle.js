@@ -2,10 +2,19 @@ import React from 'react';
 import { useTheme } from '../context/ThemeContext';
 
 const ThemeToggle = () => {
-  const { theme, toggleTheme, THEMES } = useTheme();
+  const { theme, toggleTheme, THEMES, isSystemTheme } = useTheme();
 
   // 根据当前主题渲染不同的图标
   const renderThemeIcon = () => {
+    if (isSystemTheme) {
+      return (
+        // 系统主题图标 - 自动跟随系统
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+        </svg>
+      );
+    }
+    
     switch (theme) {
       case THEMES.PURPLE:
         return (
@@ -35,6 +44,10 @@ const ThemeToggle = () => {
 
   // 根据当前主题获取按钮样式
   const getButtonStyle = () => {
+    if (isSystemTheme) {
+      return "bg-blue-100 border-2 border-blue-300 text-blue-700 hover:bg-blue-200";
+    }
+    
     switch (theme) {
       case THEMES.PURPLE:
         return "bg-purple-100 border-2 border-purple-300 text-purple-700 hover:bg-purple-200";
@@ -49,40 +62,62 @@ const ThemeToggle = () => {
 
   // 获取工具提示文本
   const getTooltipText = () => {
+    if (isSystemTheme) {
+      return "系统主题 - 点击切换至手动模式";
+    }
+    
     switch (theme) {
       case THEMES.PURPLE:
-        return "切换至暗色模式";
+        return "淡紫色主题 - 点击切换至暗色模式";
       case THEMES.DARK:
-        return "切换至粉色模式";
+        return "暗色主题 - 点击切换至粉色模式";
       case THEMES.PINK:
-        return "切换至淡紫色模式";
+        return "粉色主题 - 点击切换至淡紫色模式";
       default:
         return "切换主题";
     }
+  };
+
+  // 获取系统主题指示器
+  const getSystemIndicator = () => {
+    if (isSystemTheme) {
+      return (
+        <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border-2 border-white">
+          <div className="w-full h-full flex items-center justify-center">
+            <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
     <div className="relative group">
       <button
         onClick={toggleTheme}
-        className={`p-2 rounded-full ${getButtonStyle()} transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50`}
+        className={`p-2 rounded-full ${getButtonStyle()} transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 relative`}
         aria-label={getTooltipText()}
       >
         {renderThemeIcon()}
+        {getSystemIndicator()}
       </button>
       
       {/* 工具提示 */}
-      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs text-white bg-gray-800 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs text-white bg-gray-800 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
         {getTooltipText()}
         <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
       </div>
       
       {/* 主题指示器 */}
-                <div className="flex justify-center mt-1 space-x-1">
-                  <div className={`w-1 h-1 rounded-full ${theme === THEMES.PURPLE ? 'bg-purple-500' : 'bg-gray-300'}`}></div>
-                  <div className={`w-1 h-1 rounded-full ${theme === THEMES.DARK ? 'bg-purple-500' : 'bg-gray-300'}`}></div>
-                  <div className={`w-1 h-1 rounded-full ${theme === THEMES.PINK ? 'bg-purple-500' : 'bg-gray-300'}`}></div>
-                </div>
+      <div className="flex justify-center mt-1 space-x-1">
+        <div className={`w-1 h-1 rounded-full ${(isSystemTheme || theme === THEMES.PURPLE) ? 'bg-purple-500' : 'bg-gray-300'}`}></div>
+        <div className={`w-1 h-1 rounded-full ${(isSystemTheme || theme === THEMES.DARK) ? 'bg-purple-500' : 'bg-gray-300'}`}></div>
+        <div className={`w-1 h-1 rounded-full ${(isSystemTheme || theme === THEMES.PINK) ? 'bg-purple-500' : 'bg-gray-300'}`}></div>
+        <div className={`w-1 h-1 rounded-full ${isSystemTheme ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+      </div>
     </div>
   );
 };
