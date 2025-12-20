@@ -12,6 +12,7 @@ from datetime import datetime, date
 from fastapi import FastAPI, Query, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.middleware.gzip import GZipMiddleware
 import uvicorn
 import traceback
 from typing import List, Dict, Any, Optional
@@ -32,6 +33,8 @@ from services.maya_service import (
 )
 from services.api_docs_service import api_docs_service
 from utils.date_utils import normalize_date_string
+from utils.cache_manager import cache_manager, cached
+from utils.rate_limiter import rate_limit, rate_limiter
 
 class UnifiedBackendService:
     """统一后端服务类"""
@@ -117,6 +120,9 @@ class UnifiedBackendService:
         
     def setup_middleware(self):
         """配置中间件"""
+        # GZip压缩中间件 - 减少响应大小
+        self.app.add_middleware(GZipMiddleware, minimum_size=1000)
+        
         # CORS中间件 - 增强配置
         self.app.add_middleware(
             CORSMiddleware,
@@ -263,12 +269,27 @@ class UnifiedBackendService:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.get("/biorhythm/today")
+        @rate_limit(max_requests=60, window_size=60)  # 每分钟最多60次请求
         async def api_get_today_biorhythm(birth_date: str = Query(..., description="出生日期，格式为YYYY-MM-DD")):
             """获取今天的生物节律"""
             self.logger.info(f"计算今日生物节律 | 生日: {birth_date}")
             try:
                 birth_date = normalize_date_string(birth_date)
+                
+                # 生成缓存键
+                cache_key = f"biorhythm_today_{birth_date}"
+                
+                # 尝试从缓存获取
+                cached_result = cache_manager.get(cache_key)
+                if cached_result is not None:
+                    self.logger.info("从缓存获取今日生物节律")
+                    return cached_result
+                
                 result = get_today_biorhythm(birth_date)
+                
+                # 缓存结果（5分钟TTL）
+                cache_manager.set(cache_key, result, 300)
+                
                 self.logger.info("今日生物节律计算成功")
                 return result
             except Exception as e:
@@ -276,6 +297,7 @@ class UnifiedBackendService:
                 raise HTTPException(status_code=500, detail=str(e))
 
         @self.app.get("/biorhythm/date")
+        @rate_limit(max_requests=60, window_size=60)
         async def api_get_date_biorhythm(
             birth_date: str = Query(..., description="出生日期，格式为YYYY-MM-DD"),
             date: str = Query(..., description="目标日期，格式为YYYY-MM-DD")
@@ -285,7 +307,21 @@ class UnifiedBackendService:
             try:
                 birth_date = normalize_date_string(birth_date)
                 date = normalize_date_string(date)
+                
+                # 生成缓存键
+                cache_key = f"biorhythm_date_{birth_date}_{date}"
+                
+                # 尝试从缓存获取
+                cached_result = cache_manager.get(cache_key)
+                if cached_result is not None:
+                    self.logger.info("从缓存获取指定日期生物节律")
+                    return cached_result
+                
                 result = get_date_biorhythm(birth_date, date)
+                
+                # 缓存结果（10分钟TTL）
+                cache_manager.set(cache_key, result, 600)
+                
                 self.logger.info("指定日期生物节律计算成功")
                 return result
             except Exception as e:

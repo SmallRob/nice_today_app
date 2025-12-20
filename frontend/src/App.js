@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import BiorhythmDashboard from './components/BiorhythmDashboard';
 import DarkModeToggle from './components/DarkModeToggle';
 import { checkSystemHealth } from './services/desktopService';
@@ -11,49 +11,40 @@ function App() {
     status: 'loading'
   });
 
-  useEffect(() => {
-    // 检查应用环境
-    const checkEnvironment = async () => {
-      const isDesktop = window.electronAPI !== undefined;
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/App.js:17',message:'App component checking environment',data:{isDesktop,hasElectronAPI:typeof window.electronAPI!=='undefined',apiReady:window.electronAPI?.isReady?.()||false},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
-      
-      if (isDesktop) {
-        try {
-          const healthResult = await checkSystemHealth();
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/App.js:22',message:'Health check result',data:{success:healthResult.success,hasData:!!healthResult.data},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-          // #endregion
-          setAppInfo({
-            isDesktop: true,
-            version: window.electronAPI?.appInfo?.version || 'v1.0.0',
-            status: healthResult.success ? 'ready' : 'error',
-            health: healthResult.data
-          });
-        } catch (error) {
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/b3387138-a87a-4b03-a45b-f70781421b47',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/App.js:29',message:'Health check error',data:{error:error.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-          // #endregion
-          setAppInfo({
-            isDesktop: true,
-            version: 'v1.0.0',
-            status: 'error',
-            error: error.message
-          });
-        }
-      } else {
+  // 使用useCallback优化回调函数
+  const checkEnvironment = useCallback(async () => {
+    const isDesktop = window.electronAPI !== undefined;
+    
+    if (isDesktop) {
+      try {
+        const healthResult = await checkSystemHealth();
         setAppInfo({
-          isDesktop: false,
+          isDesktop: true,
+          version: window.electronAPI?.appInfo?.version || 'v1.0.0',
+          status: healthResult.success ? 'ready' : 'error',
+          health: healthResult.data
+        });
+      } catch (error) {
+        setAppInfo({
+          isDesktop: true,
           version: 'v1.0.0',
-          status: 'web',
-          message: 'Web版本功能受限，建议下载桌面应用以获得完整体验'
+          status: 'error',
+          error: error.message
         });
       }
-    };
-
-    checkEnvironment();
+    } else {
+      setAppInfo({
+        isDesktop: false,
+        version: 'v1.0.0',
+        status: 'web',
+        message: 'Web版本功能受限，建议下载桌面应用以获得完整体验'
+      });
+    }
   }, []);
+
+  useEffect(() => {
+    checkEnvironment();
+  }, [checkEnvironment]);
 
   return (
     <div className="App min-h-screen bg-white dark:bg-gray-900">

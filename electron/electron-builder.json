@@ -9,7 +9,6 @@
   "files": [
     "main.js",
     "preload.js",
-    "women-health-main.js",
     "package.json",
     {
       "from": "public",
@@ -42,7 +41,7 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "build/icons/icon-256x256.ico",
+    "icon": "nice_day.png",
     "publisherName": "Nice Today",
     "verifyUpdateCodeSignature": false
   },
@@ -52,8 +51,8 @@
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
     "shortcutName": "Nice Today",
-    "installerIcon": "build/icons/icon-256x256.ico",
-    "uninstallerIcon": "build/icons/icon-256x256.ico"
+    "installerIcon": "nice_day.png",
+    "uninstallerIcon": "nice_day.png"
   },
   "mac": {
     "target": [
@@ -62,7 +61,7 @@
         "arch": ["x64", "arm64"]
       }
     ],
-    "icon": "build/icons/icon-512x512.png",
+    "icon": "nice_day.png",
     "category": "public.app-category.lifestyle",
     "darkModeSupport": true
   },
@@ -77,7 +76,7 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "build/icons/icon-256x256.png",
+    "icon": "nice_day.png",
     "category": "Education",
     "desktop": {
       "Name": "Nice Today",
