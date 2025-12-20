@@ -42,7 +42,96 @@ const HEALTH_ADVICE = {
   }
 };
 
+// 动态丝带样式
+const ribbonStyles = `
+  @keyframes ribbonFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  @keyframes ribbonWave {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  @keyframes shimmer {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+  }
+  
+  .ribbon-banner {
+    background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb, #a6c1ee);
+    background-size: 400% 400%;
+    animation: ribbonFlow 8s ease infinite;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    color: white;
+    padding: 24px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .ribbon-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(105deg, 
+      rgba(255,255,255,0) 40%, 
+      rgba(255,255,255,0.2) 50%, 
+      rgba(255,255,255,0) 60%);
+    animation: shimmer 3s infinite;
+  }
+  
+  .ribbon-banner::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 105, 180, 0.1) 50%, 
+      transparent 100%);
+    animation: ribbonWave 4s linear infinite;
+  }
+  
+  .ribbon-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .ribbon-banner h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+  
+  .ribbon-banner p {
+    font-size: 0.875rem;
+    opacity: 0.95;
+    line-height: 1.4;
+  }
+`;
+
 const MenstrualAssistant = () => {
+  // 添加动态丝带样式到页面
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = ribbonStyles;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+  
   const [cycles, setCycles] = useState([]);
   const [records, setRecords] = useState([]);
   const [prediction, setPrediction] = useState(null);
@@ -298,16 +387,16 @@ const MenstrualAssistant = () => {
           </div>
           
           {/* 经期助手标语 */}
-          <div className="mt-6 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl shadow-lg p-6 text-white">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+          <div className="ribbon-banner">
+            <div className="ribbon-content flex items-center">
+              <div className="flex-shrink-0 w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4 backdrop-blur-sm">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div>
                 <h3 className="text-lg font-semibold">科学呵护您的每个月</h3>
-                <p className="text-white text-opacity-90 text-sm mt-1">
+                <p className="text-sm mt-1">
                   基于医学研究和大数据分析，为您提供精准的周期预测和个性化的健康指导
                 </p>
               </div>

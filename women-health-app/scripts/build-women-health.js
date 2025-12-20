@@ -27,8 +27,10 @@ function cleanBuildDir() {
 function buildFrontend() {
     console.log('\n📦 构建女性健康管理前端应用...');
     try {
-        execSync('cd frontend && npm run build', { 
-            stdio: 'inherit'
+        const frontendPath = path.join(__dirname, '../frontend');
+        execSync('npm run build', { 
+            stdio: 'inherit',
+            cwd: frontendPath
         });
         console.log('✅ 前端构建完成');
     } catch (error) {
@@ -42,10 +44,14 @@ function buildElectron() {
     console.log('\n🍎 构建Electron应用...');
     
     try {
-        const buildCommand = 'cd electron && npx electron-builder --config electron-builder-women-health.json';
+        const electronPath = path.join(__dirname, '../electron');
+        const buildCommand = 'npx electron-builder --config electron-builder-women-health.json';
         
         console.log(`执行命令: ${buildCommand}`);
-        execSync(buildCommand, { stdio: 'inherit' });
+        execSync(buildCommand, { 
+            stdio: 'inherit',
+            cwd: electronPath
+        });
         console.log('✅ Electron应用构建完成');
     } catch (error) {
         console.error('❌ Electron应用构建失败:', error.message);
